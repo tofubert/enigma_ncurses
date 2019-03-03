@@ -30,22 +30,67 @@ class Grid():
         for field_x in range(self.grid_w):
             for field_y in range(self.grid_h):
                 dim = self.calc_dimensions(field_x, field_y)
-                self.draw_border(dim)
+                self.draw_border(dim, field_x, field_y)
                 self.fields[field_y][field_x] = Field(self.window, dim)
+        self.draw_axis()
         self.window.refresh()
 
-    def draw_border(self, dim):
+    def draw_axis(self):
+        width = (self.maxx - 2) / self.grid_w
+        hight = (self.maxy - 2) / self.grid_h
+
+        for field_x in range(self.grid_w):
+            x = 1 + (width * field_x) + int(width/2)
+            self.window.addch(1 , x, chr(65+field_x), curses.A_BOLD)
+            self.window.addch(1, x+1, chr(65+field_x), curses.A_BOLD)
+        for field_y in range(self.grid_h):
+            y = 1 + (hight * field_y) + int(hight/2)
+
+            self.window.addch(y , 0, chr(65+field_y), curses.A_BOLD)
+
+    def draw_border(self, dim, field_x, field_y):
         rectangle(self.window, dim.y0+1, dim.x0+1, dim.y1+1, dim.x1+1)
-        self.window.addch(dim.y0+1, dim.x0+1, curses.ACS_SSSS)
-        self.window.addch(dim.y1+1, dim.x0+1, curses.ACS_SSSS)
-        self.window.addch(dim.y1+1, dim.x1+1, curses.ACS_SSSS)
-        self.window.addch(dim.y0+1, dim.x1+1, curses.ACS_SSSS)
+        if field_x == 0:
+            if field_y == 0:
+                self.window.addch(dim.y0 + 1, dim.x0 + 1, curses.ACS_ULCORNER)
+            else:
+                self.window.addch(dim.y0 + 1, dim.x0 + 1, curses.ACS_LTEE)
+            if field_y == self.grid_h-1:
+                self.window.addch(dim.y1 + 1, dim.x0 + 1, curses.ACS_LLCORNER)
+            else:
+                self.window.addch(dim.y1 + 1, dim.x0 + 1, curses.ACS_LTEE)
+        elif field_x == self.grid_w -1:
+            if field_y == 0:
+                self.window.addch(dim.y0 + 1, dim.x1 + 1, curses.ACS_URCORNER)
+            else:
+                self.window.addch(dim.y0 + 1, dim.x1 + 1, curses.ACS_RTEE)
+            if field_y == self.grid_h-1:
+                self.window.addch(dim.y1 + 1, dim.x1 + 1, curses.ACS_LRCORNER)
+            else:
+                self.window.addch(dim.y1 + 1, dim.x1 + 1, curses.ACS_RTEE)
+            if field_y == 0:
+                self.window.addch(dim.y0 + 1, dim.x0 + 1, curses.ACS_TTEE)
+            else:
+                self.window.addch(dim.y0 + 1, dim.x0 + 1, curses.ACS_SSSS)
+            if field_y == self.grid_h-1:
+                self.window.addch(dim.y1 + 1, dim.x0 + 1, curses.ACS_BTEE)
+            else:
+                self.window.addch(dim.y1 + 1, dim.x0 + 1, curses.ACS_SSSS)
+        else:
+            if field_y == 0:
+                self.window.addch(dim.y0 + 1, dim.x0 + 1, curses.ACS_TTEE)
+            else:
+                self.window.addch(dim.y0 + 1, dim.x0 + 1, curses.ACS_SSSS)
+            if field_y == self.grid_h-1:
+                self.window.addch(dim.y1 + 1, dim.x0 + 1, curses.ACS_BTEE)
+            else:
+                self.window.addch(dim.y1 + 1, dim.x0 + 1, curses.ACS_SSSS)
 
     def calc_dimensions(self, field_x, field_y):
         width = (self.maxx - 2) / self.grid_w
         hight = (self.maxy - 2) / self.grid_h
-        startx = (width * field_x)
-        starty = (hight * field_y)
+        startx = 1 + (width * field_x)
+        starty = 1 + (hight * field_y)
         return WinDim(starty, startx, starty + hight, startx + width)
 
 
