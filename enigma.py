@@ -3,6 +3,7 @@ import curses
 from curses import wrapper
 from curses.textpad import rectangle
 from Morse import Morse
+from Grid import Grid
 
 
 
@@ -62,6 +63,8 @@ def main(stdscr):
                   speed_color=BLACK_ON_BLUE,
                   volume_color=BLACK_ON_BLUE,
                   backround=WHITE_ON_BLACK)
+
+    grid = Grid(boatwin)
 
     menuwin.addstr(0,0, "MENU STUFF")
     # menuwin.bkgd(curses.color_pair(2))
