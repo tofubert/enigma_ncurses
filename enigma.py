@@ -64,7 +64,11 @@ def main(stdscr):
                   volume_color=BLACK_ON_BLUE,
                   backround=WHITE_ON_BLACK)
 
-    grid = Grid(boatwin)
+    grid = Grid(boatwin,
+                convoi_color = BLACK_ON_BLUE,
+                mine_color = BLACK_ON_YELLOW,
+                uboat_color = BLACK_ON_RED,
+                path_color = BLACK_ON_CYAN)
 
     menuwin.addstr(0,0, "MENU STUFF")
     # menuwin.bkgd(curses.color_pair(2))

@@ -12,28 +12,65 @@ class WinDim:
         self.cols = x1 - x0
         self.lines = y1 - y0
 
-class Field():
 
+class Field:
     def __init__(self, parent, dim):
-        # self.window = parent.subwin(dim.lines, dim.cols, dim.y0, dim.x0)
-        pass
+        self.window = parent.derwin(dim.lines - 1, dim.cols - 1, dim.y0+2, dim.x0+2)
+        # self.window.bkgd("~")
+        self.window.refresh()
 
-class Grid():
+    def set_color(self, color):
+        self.window.bkgd(" ", color)
 
-    def __init__(self, window):
+    def set_convoi(self, color):
+        # self.window.bkgd(" ", color)
+        self.window.addstr(0,0,"       |\\")
+        self.window.addstr(1,0,"       | \\")
+        self.window.addstr(2,0,"       |  \\")
+        self.window.addstr(3,0,"       |___\\")
+        self.window.addstr(4,0,"___\--|----/____")
+        self.window.addstr(5,0,"    \_____/")
+        self.window.refresh()
+
+    def set_uboat(self, color):
+        # self.window.bkgd(" ", color)
+        self.window.addstr(0,0,"         __  |__")
+        self.window.addstr(1,0,"       __L L_|L L__")
+        self.window.addstr(2,0," ...[+(____________)")
+        self.window.addstr(3,0,"        C_________/")
+        self.window.refresh()
+
+
+
+class Grid:
+
+    def __init__(self, window, convoi_color, mine_color, uboat_color, path_color):
         self.window = window
         self.maxy, self.maxx = window.getmaxyx()
-        self.grid_w = 8
-        self.grid_h = 6
+        self.grid_w = 5
+        self.grid_h = 4
+        self.convoi_color, self.mine_color, self.uboat_color, self.path_color = convoi_color, mine_color, uboat_color, path_color
 
         self.fields = [[0 for x in range(self.grid_w)] for y in range(self.grid_h)]
+
+        self.draw_axis()
+
         for field_x in range(self.grid_w):
             for field_y in range(self.grid_h):
                 dim = self.calc_dimensions(field_x, field_y)
                 self.draw_border(dim, field_x, field_y)
                 self.fields[field_y][field_x] = Field(self.window, dim)
-        self.draw_axis()
+        self.set_convoi(3,0)
+        self.set_uboat(0,0)
+        self.set_uboat(1,4)
         self.window.refresh()
+
+
+    def set_convoi(self, y, x):
+        (self.fields[y][x]).set_convoi(self.convoi_color)
+
+    def set_uboat(self, y, x):
+        (self.fields[y][x]).set_uboat(self.convoi_color)
 
     def draw_axis(self):
         width = (self.maxx - 2) / self.grid_w
