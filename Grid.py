@@ -5,12 +5,12 @@ import curses
 
 class WinDim:
     def __init__(self, y0, x0, y1, x1):
-        self.x0 = x0
-        self.y0 = y0
-        self.x1 = x1
-        self.y1 = y1
-        self.cols = x1 - x0
-        self.lines = y1 - y0
+        self.x0 = int(x0)
+        self.y0 = int(y0)
+        self.x1 = int(x1)
+        self.y1 = int(y1)
+        self.cols = int(x1 - x0)
+        self.lines = int(y1 - y0)
 
 
 class Field:
@@ -23,21 +23,21 @@ class Field:
         self.window.bkgd(" ", color)
 
     def set_convoi(self, color):
-        # self.window.bkgd(" ", color)
-        self.window.addstr(0,0,"       |\\")
-        self.window.addstr(1,0,"       | \\")
-        self.window.addstr(2,0,"       |  \\")
-        self.window.addstr(3,0,"       |___\\")
-        self.window.addstr(4,0,"___\--|----/____")
-        self.window.addstr(5,0,"    \_____/")
+        self.window.bkgd(" ", color)
+        # self.window.addstr(0,0,"       |\\")
+        # self.window.addstr(1,0,"       | \\")
+        # self.window.addstr(2,0,"       |  \\")
+        # self.window.addstr(3,0,"       |___\\")
+        # self.window.addstr(4,0,"___\--|----/____")
+        # self.window.addstr(5,0,"    \_____/")
         self.window.refresh()
 
     def set_uboat(self, color):
-        # self.window.bkgd(" ", color)
-        self.window.addstr(0,0,"         __  |__")
-        self.window.addstr(1,0,"       __L L_|L L__")
-        self.window.addstr(2,0," ...[+(____________)")
-        self.window.addstr(3,0,"        C_________/")
+        self.window.bkgd(" ", color)
+        # self.window.addstr(0,0,"         __  |__")
+        # self.window.addstr(1,0,"       __L L_|L L__")
+        # self.window.addstr(2,0," ...[+(____________)")
+        # self.window.addstr(3,0,"        C_________/")
         self.window.refresh()
 
 
@@ -47,8 +47,8 @@ class Grid:
     def __init__(self, window, convoi_color, mine_color, uboat_color, path_color):
         self.window = window
         self.maxy, self.maxx = window.getmaxyx()
-        self.grid_w = 5
-        self.grid_h = 4
+        self.grid_w = 9
+        self.grid_h = 6
         self.convoi_color, self.mine_color, self.uboat_color, self.path_color = convoi_color, mine_color, uboat_color, path_color
 
         self.fields = [[0 for x in range(self.grid_w)] for y in range(self.grid_h)]
@@ -58,7 +58,10 @@ class Grid:
         for field_x in range(self.grid_w):
             for field_y in range(self.grid_h):
                 dim = self.calc_dimensions(field_x, field_y)
-                self.draw_border(dim, field_x, field_y)
+                try:
+                    self.draw_border(dim, field_x, field_y)
+                except:
+                    pass
                 self.fields[field_y][field_x] = Field(self.window, dim)
         self.set_convoi(3,0)
         self.set_uboat(0,0)
@@ -70,11 +73,11 @@ class Grid:
         (self.fields[y][x]).set_convoi(self.convoi_color)
 
     def set_uboat(self, y, x):
-        (self.fields[y][x]).set_uboat(self.convoi_color)
+        (self.fields[y][x]).set_uboat(self.uboat_color)
 
     def draw_axis(self):
-        width = (self.maxx - 2) / self.grid_w
-        hight = (self.maxy - 2) / self.grid_h
+        width = int((self.maxx - 2) / self.grid_w)
+        hight = int((self.maxy - 2) / self.grid_h)
 
         for field_x in range(self.grid_w):
             x = 1 + (width * field_x) + int(width/2)
@@ -124,8 +127,8 @@ class Grid:
                 self.window.addch(dim.y1 + 1, dim.x0 + 1, curses.ACS_SSSS)
 
     def calc_dimensions(self, field_x, field_y):
-        width = (self.maxx - 2) / self.grid_w
-        hight = (self.maxy - 2) / self.grid_h
+        width = int((self.maxx - 2) / (self.grid_w))
+        hight = int((self.maxy - 2) / (self.grid_h))
         startx = 1 + (width * field_x)
         starty = 1 + (hight * field_y)
         return WinDim(starty, startx, starty + hight, startx + width)

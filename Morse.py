@@ -48,7 +48,7 @@ class Morse():
         window.addstr(y, 0, "VOLUME")
         rectangle(window, y + 1, 0, y + 3, self.maxx - 1)
         self.volume_y = y + 2
-        self.set_volume((self.maxx-2)/2)
+        self.set_volume(int((self.maxx-2)/2))
         y = y + 4
 
     def update_status(self, color=None):
@@ -60,7 +60,7 @@ class Morse():
 
     def set_volume(self, volume):
         self.window.addnstr(self.volume_y, 1, " " * (self.maxx - 2), self.maxx - 2, self.backround_color)
-        self.window.addnstr(self.volume_y, 1, " " * volume, self.maxx - 2, self.volume_color)
+        self.window.addnstr(self.volume_y, 1, " " * int(volume), self.maxx - 2, self.volume_color)
         self.window.refresh()
         self.volume = volume
 
@@ -68,7 +68,7 @@ class Morse():
         if self.volume +1 <= self.maxx-2:
             self.volume = self.volume+1
         self.window.addnstr(self.volume_y, 1, " " * (self.maxx - 2), self.maxx - 2, self.backround_color)
-        self.window.addnstr(self.volume_y, 1, " " * self.volume, self.maxx - 2, self.volume_color)
+        self.window.addnstr(self.volume_y, 1, " " * int(self.volume), self.maxx - 2, self.volume_color)
         self.window.refresh()
 
     def decrease_volume(self):

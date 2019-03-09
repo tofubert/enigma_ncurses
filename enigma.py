@@ -40,7 +40,7 @@ def main(stdscr):
 
 
 
-    stdscr.addstr(0, 0, "Enigma: Save out Convoy  y{} x{}".format( curses.LINES, curses.COLS))
+    stdscr.addstr(0, 0, "Enigma: Save our Convoy")
 
     boatwin = curses.newwin(BOAT_WIN.lines, BOAT_WIN.cols, BOAT_WIN.y0, BOAT_WIN.x0)
     rectangle(stdscr, BOAT_WIN.y0-1, BOAT_WIN.x0-1, BOAT_WIN.y1, BOAT_WIN.x1)
