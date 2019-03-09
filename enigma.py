@@ -4,6 +4,7 @@ from curses import wrapper
 from curses.textpad import rectangle
 from Morse import Morse
 from Grid import Grid
+from Menu import Menu
 
 
 
@@ -17,6 +18,7 @@ def main(stdscr):
     curses.init_pair(4, curses.COLOR_BLACK, curses.COLOR_BLUE)
     curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_YELLOW)
     curses.init_pair(6, curses.COLOR_WHITE, curses.COLOR_BLACK)
+    curses.init_pair(7, curses.COLOR_BLACK, curses.COLOR_MAGENTA)
 
     BLACK_ON_CYAN = curses.color_pair(1)
     BLACK_ON_RED = curses.color_pair(2)
@@ -24,6 +26,7 @@ def main(stdscr):
     BLACK_ON_BLUE = curses.color_pair(4)
     BLACK_ON_YELLOW = curses.color_pair(5)
     WHITE_ON_BLACK = curses.color_pair(6)
+    MAGENTA_ON_BLACK = curses.color_pair(7)
 
     class WinDim:
         def __init__(self, y0, x0, y1, x1):
@@ -34,7 +37,7 @@ def main(stdscr):
             self.cols = x1-x0
             self.lines = y1-y0
 
-    BOAT_WIN = WinDim(2, 1, int(curses.LINES * 0.8), int(curses.COLS * 0.8))
+    BOAT_WIN = WinDim(2, 1, int(curses.LINES  - 5 ), int(curses.COLS * 0.8))
     MENU_WIN = WinDim(BOAT_WIN.y1+1, 1, curses.LINES - 1, curses.COLS - 1)
     MORSE_WIN = WinDim(2, BOAT_WIN.x1+1, BOAT_WIN.y1, curses.COLS - 1)
 
@@ -49,11 +52,11 @@ def main(stdscr):
     rectangle(stdscr, MORSE_WIN.y0-1, MORSE_WIN.x0-1, MORSE_WIN.y1, MORSE_WIN.x1)
 
     menuwin = curses.newwin(MENU_WIN.lines, MENU_WIN.cols, MENU_WIN.y0, MENU_WIN.x0)
-    #rectangle(stdscr, MENU_WIN.y0-1, MENU_WIN.x0-1, MENU_WIN.y1, MENU_WIN.x1)
 
     stdscr.refresh()
 
-    # boatwin.bkgd(curses.color_pair(1))
+    curses.cbreak()
+
     boatwin.refresh()
 
     morse = Morse(morsewin,
@@ -68,35 +71,13 @@ def main(stdscr):
                 convoi_color = BLACK_ON_BLUE,
                 mine_color = BLACK_ON_YELLOW,
                 uboat_color = BLACK_ON_RED,
-                path_color = BLACK_ON_CYAN)
-
-    menuwin.addstr(0,0, "MENU STUFF")
-    # menuwin.bkgd(curses.color_pair(2))
-    menuwin.refresh()
-    # box = Textbox(boatwin)
-
-    key = " "
-    while(key != "q"):
-        try:
-            key = stdscr.getkey()
-        except:
-            key = " "
-        morse.update_status()
-        if key == "+":
-            morse.increase_volume()
-        if key == "-":
-            morse.decrease_volume()
-        if key == "9":
-            morse.increase_speed()
-        if key == "6":
-            morse.decrease_speed()
-        if key == "1":
-            morse.toggle_send_receive()
-
-    # # Let the user edit until Ctrl-G is struck.
-    # box.edit()
-    #
-    # # Get resulting contents
-    # message = box.gather()
+                uboat_danger_color=MAGENTA_ON_BLACK,
+                path_color = BLACK_ON_CYAN,
+                default_color = WHITE_ON_BLACK)
+    menu = Menu(menuwin,
+                morse=morse,
+                grid=grid,
+                stdscr=stdscr)
+    menu.run()
 
 wrapper(main)

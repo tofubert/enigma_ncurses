@@ -14,42 +14,69 @@ class WinDim:
 
 
 class Field:
-    def __init__(self, parent, dim):
+    def __init__(self, parent, dim, default_color):
         self.window = parent.derwin(dim.lines - 1, dim.cols - 1, dim.y0+2, dim.x0+2)
         # self.window.bkgd("~")
         self.window.refresh()
+        self.default_color = default_color
+        self.danger_reffs = []
+        self.uboat_name = ""
 
     def set_color(self, color):
         self.window.bkgd(" ", color)
+        self.window.refresh()
 
     def set_convoi(self, color):
-        self.window.bkgd(" ", color)
-        # self.window.addstr(0,0,"       |\\")
-        # self.window.addstr(1,0,"       | \\")
-        # self.window.addstr(2,0,"       |  \\")
-        # self.window.addstr(3,0,"       |___\\")
-        # self.window.addstr(4,0,"___\--|----/____")
-        # self.window.addstr(5,0,"    \_____/")
+        self.set_color(color)
+
+    def set_mine(self, color):
+        self.set_color(color)
+
+
+    def set_uboat(self, color, name):
+        self.set_color(color)
+        self.window.addstr(1,0, name)
+        self.uboat_name = name
         self.window.refresh()
 
-    def set_uboat(self, color):
-        self.window.bkgd(" ", color)
-        # self.window.addstr(0,0,"         __  |__")
-        # self.window.addstr(1,0,"       __L L_|L L__")
-        # self.window.addstr(2,0," ...[+(____________)")
-        # self.window.addstr(3,0,"        C_________/")
+    def set_uboat_danger(self, color, name):
+        self.set_color(color)
+        self.danger_reffs.append(name)
         self.window.refresh()
 
+    def unset_convoi(self):
+        self.set_color(self.default_color)
+
+    def unset_mine(self):
+        self.set_color(self.default_color)
+
+    def unset_uboat(self, color, name):
+        self.window.erase()
+        self.set_color(self.default_color)
+        self.uboat_name = ""
+        self.window.refresh()
+
+    def unset_uboat_danger(self, name):
+        try:
+            index = self.danger_reffs.index(name)
+            del self.danger_reffs[index]
+            if len(self.danger_reffs) == 0:
+                self.set_color(self.default_color)
+                self.window.refresh()
+        except:
+            pass
 
 
 class Grid:
 
-    def __init__(self, window, convoi_color, mine_color, uboat_color, path_color):
+    def __init__(self, window, convoi_color, mine_color, uboat_color, uboat_danger_color, path_color, default_color):
         self.window = window
         self.maxy, self.maxx = window.getmaxyx()
         self.grid_w = 9
         self.grid_h = 6
         self.convoi_color, self.mine_color, self.uboat_color, self.path_color = convoi_color, mine_color, uboat_color, path_color
+        self.uboat_danger_color = uboat_danger_color
+        self.default_color = default_color
 
         self.fields = [[0 for x in range(self.grid_w)] for y in range(self.grid_h)]
 
@@ -62,18 +89,37 @@ class Grid:
                     self.draw_border(dim, field_x, field_y)
                 except:
                     pass
-                self.fields[field_y][field_x] = Field(self.window, dim)
+                self.fields[field_y][field_x] = Field(self.window, dim, self.default_color)
         self.set_convoi(3,0)
-        self.set_uboat(0,0)
-        self.set_uboat(1,4)
+        self.set_uboat(0,0, "U110")
+        self.set_uboat(1,4, "U888")
+        legend = 0
+        uboat_legent = "UBOAT"
+        uboat_danger_legent = "UBOAT_RANGE"
+        mine_legent = "MINE"
+        convoi_legent = "CONVOI"
+        self.window.addstr(0,legend,uboat_legent, self.uboat_color)
+        legend = legend + len(uboat_legent) + 1
+
+        self.window.addstr(0,legend,uboat_danger_legent, self.uboat_danger_color)
+        legend = legend + len(uboat_danger_legent) + 1
+
+        self.window.addstr(0,legend,mine_legent, self.mine_color)
+        legend = legend + len(mine_legent) + 1
+
+        self.window.addstr(0,legend,convoi_legent, self.convoi_color)
+        legend = legend + len(convoi_legent) + 1
+
         self.window.refresh()
 
-
     def set_convoi(self, y, x):
-        (self.fields[y][x]).set_convoi(self.convoi_color)
+        if y >= 0 and x >= 0 and x < self.grid_w and y < self.grid_h:
+            (self.fields[y][x]).set_convoi(self.convoi_color)
 
-    def set_uboat(self, y, x):
-        (self.fields[y][x]).set_uboat(self.uboat_color)
+    def set_uboat(self, y, x, name):
+        if y >= 0 and x >= 0 and x < self.grid_w and y < self.grid_h:
+            (self.fields[y][x]).set_uboat(self.uboat_color, name)
+
 
     def draw_axis(self):
         width = int((self.maxx - 2) / self.grid_w)
