@@ -19,6 +19,7 @@ def main(stdscr):
     curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_YELLOW)
     curses.init_pair(6, curses.COLOR_WHITE, curses.COLOR_BLACK)
     curses.init_pair(7, curses.COLOR_BLACK, curses.COLOR_MAGENTA)
+    curses.init_pair(8, curses.COLOR_BLACK, curses.COLOR_WHITE)
 
     BLACK_ON_CYAN = curses.color_pair(1)
     BLACK_ON_RED = curses.color_pair(2)
@@ -26,7 +27,8 @@ def main(stdscr):
     BLACK_ON_BLUE = curses.color_pair(4)
     BLACK_ON_YELLOW = curses.color_pair(5)
     WHITE_ON_BLACK = curses.color_pair(6)
-    MAGENTA_ON_BLACK = curses.color_pair(7)
+    BLACK_ON_MAGENTA = curses.color_pair(7)
+    BLACK_ON_WHITE = curses.color_pair(8)
 
     class WinDim:
         def __init__(self, y0, x0, y1, x1):
@@ -54,6 +56,7 @@ def main(stdscr):
     menuwin = curses.newwin(MENU_WIN.lines, MENU_WIN.cols, MENU_WIN.y0, MENU_WIN.x0)
 
     stdscr.refresh()
+    stdscr.nodelay(True)
 
     curses.cbreak()
 
@@ -71,7 +74,7 @@ def main(stdscr):
                 convoi_color = BLACK_ON_BLUE,
                 mine_color = BLACK_ON_YELLOW,
                 uboat_color = BLACK_ON_RED,
-                uboat_danger_color=MAGENTA_ON_BLACK,
+                uboat_danger_color=BLACK_ON_MAGENTA,
                 path_color = BLACK_ON_CYAN,
                 default_color = WHITE_ON_BLACK)
     menu = Menu(menuwin,

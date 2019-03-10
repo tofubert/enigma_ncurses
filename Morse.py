@@ -33,13 +33,13 @@ class Morse():
         self.toggle_send_receive()
         y = y + 4
 
-        window.addstr(y, 0, "STATUS")
+        window.addstr(y, 0, "SECURE LINK")
         rectangle(window, y + 1, 0, y + 3, self.maxx - 1)
         self.status_y = y + 2
         self.update_status(status_color)
         y = y + 4
 
-        window.addstr(y, 0, "SPEED")
+        window.addstr(y, 0, "SPEED 0 - {}".format(self.maxx-2))
         rectangle(window, y + 1, 0, y + 3, self.maxx - 1)
         self.speed_y = y + 2
         self.set_speed(1)
