@@ -148,7 +148,7 @@ class Grid:
         self.window.refresh()
 
     def check_bounds(self, y , x):
-        if y >= 0 and x >= 0 and y < self.grid_h and x < self.grid_h:
+        if y >= 0 and x >= 0 and y < self.grid_h and x < self.grid_w:
             return True
         else:
             False
