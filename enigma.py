@@ -76,7 +76,9 @@ def main(stdscr):
                 uboat_color = BLACK_ON_RED,
                 uboat_danger_color=BLACK_ON_MAGENTA,
                 path_color = BLACK_ON_CYAN,
-                default_color = WHITE_ON_BLACK)
+                default_color = WHITE_ON_BLACK,
+                # preload_file="foobar"
+                )
     menu = Menu(menuwin,
                 morse=morse,
                 grid=grid,

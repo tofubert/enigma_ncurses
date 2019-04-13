@@ -1,5 +1,6 @@
 import logging
 from enum import Enum
+import json
 
 from curses.textpad import rectangle
 import curses
@@ -15,12 +16,21 @@ class WinDim:
 
 
 class FieldState(Enum):
-    EMPTY = 0
-    UBOAT = 1
-    MINE = 2
-    DANGER_ZONE = 3
-    PATH = 4
-    CONVOI = 5
+    EMPTY = 0, "Empty"
+    UBOAT = 1, "UBoat"
+    MINE = 2, "Mine"
+    DANGER_ZONE = 3, "Uboat Range"
+    PATH = 4, "Convoi Path"
+    CONVOI = 5, "Convoi Location"
+
+    def __new__(cls, value, name):
+        member = object.__new__(cls)
+        member._value_ = value
+        member.fullname = name
+        return member
+
+    def __int__(self):
+        return self.value
 
 HIDE_DANGER_STATE = [
     FieldState.MINE,
@@ -80,6 +90,11 @@ class Field:
             self.set_color(color)
         self.window.refresh()
 
+    def set_convoi_path(self):
+        self.convoi_path = True
+        self.state = FieldState.PATH
+        self.set_color(self.path_color)
+
     def check_for_danger_and_empty_field(self):
         if len(self.danger_reffs) == 0:
             self.set_color(self.default_color)
@@ -124,7 +139,7 @@ class Field:
 
 class Grid:
 
-    def __init__(self, window, convoi_color, mine_color, uboat_color, uboat_danger_color, path_color, default_color):
+    def __init__(self, window, convoi_color, mine_color, uboat_color, uboat_danger_color, path_color, default_color, preload_file=None):
         self.window = window
         self.maxy, self.maxx = window.getmaxyx()
         self.grid_w = 9
@@ -151,9 +166,13 @@ class Grid:
                 self.fields[field_y][field_x] = Field(self.window, dim,
                                                       self.default_color,
                                                       path_color = self.path_color)
-        (self.fields[self.convoi_y][self.convoi_x]).set_convoi(self.convoi_color)
-        self.set_uboat(0,0, "U110")
-        self.set_uboat(1,4, "U888")
+        if preload_file:
+            self.preload(preload_file)
+        else:
+            (self.fields[self.convoi_y][self.convoi_x]).set_convoi_path()
+            (self.fields[self.convoi_y][self.convoi_x]).set_convoi(self.convoi_color)
+            self.set_uboat(0,0, "U110")
+            self.set_uboat(1,4, "U888")
         legend = 0
         uboat_legent = "UBOAT"
         uboat_danger_legent = "UBOAT_RANGE"
@@ -201,7 +220,7 @@ class Grid:
         if y >= 0 and x >= 0 and x < self.grid_w and y < self.grid_h:
             if (self.fields[y][x]).state == FieldState.EMPTY:
                 (self.fields[self.convoi_y][self.convoi_x]).unset_convoi()
-                (self.fields[self.convoi_y][self.convoi_x]).toggle_convoi_path()
+                (self.fields[self.convoi_y][self.convoi_x]).set_convoi_path()
                 (self.fields[y][x]).set_convoi(self.convoi_color)
                 self.convoi_x = x
                 self.convoi_y = y
@@ -313,6 +332,38 @@ class Grid:
                 (self.fields[y][x]).unset_convoi()
                 (self.fields[y][x]).unset_convoi_path()
         (self.fields[self.convoi_y][self.convoi_x]).set_convoi(self.convoi_color)
+
+    def serialize(self, file_name):
+        data = {}
+        for x in range(self.grid_w):
+            data[x] = {}
+            for y in range(self.grid_h):
+                data[x][y] = {}
+                state = int((self.fields[y][x]).state)
+                data[x][y]["state"] = state
+                if state == int(FieldState.UBOAT):
+                    data[x][y]["name"] = (self.fields[y][x]).uboat_name
+        with open(file_name, 'w') as f:
+            json.dump(data, f, sort_keys=True)
+
+    def preload(self, preload_file):
+        with open(preload_file, 'r') as f:
+            data = json.load(f)
+        for x in range(self.grid_w):
+            for y in range(self.grid_h):
+                state = data[str(x)][str(y)]["state"]
+                if state == int(FieldState.UBOAT):
+                    name = "Foo"
+                    #data[str(x)][str(y)]["name"]
+                    self.set_uboat(y,x,name)
+                elif state == int(FieldState.MINE):
+                    self.set_mine(y,x)
+                elif state == int(FieldState.PATH):
+                    (self.fields[y][x]).set_convoi_path()
+                elif state == int(FieldState.CONVOI):
+                    self.set_convoi(y, x)
+
+
 
 
 

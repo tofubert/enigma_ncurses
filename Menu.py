@@ -41,7 +41,7 @@ class Menu:
                 "4": (self.grid.move_convoi_left, "Grid", "Move Convoi Left", self.SHOW),
                 "6": (self.grid.move_convoi_right, "Grid", "Move Convoi Right", self.SHOW),
                 "0": (self.reset_convoi, "Grid", "Reset Convoi path", self.SHOW),
-                "a": (self.no_action, "Grid", "SUBMIT", self.SHOW),
+                "a": (self.submit, "Grid", "SUBMIT", self.SHOW),
                 "\n": (self.no_action, "Main", "Go the main Menu", self.SHOW),
 
             },
@@ -159,6 +159,9 @@ class Menu:
     def reset_convoi(self):
         self.grid.reset_convoi()
         self.grid.reset_convoi()
+
+    def submit(self):
+        self.grid.serialize("foobar")
 
     def no_action(self):
         self.hidden_state = 0
