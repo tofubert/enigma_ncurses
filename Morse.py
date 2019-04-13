@@ -2,6 +2,7 @@ import string
 import random
 from curses.textpad import rectangle
 
+from MorseCodeGameEngine import MorseCodeGameEngine
 
 def random_generator(size=15, chars=string.ascii_uppercase + string.digits, padsize=15):
     str_size = random.randint(1, size)
@@ -20,9 +21,9 @@ class Morse():
         self.receive_array_color = receive_array_color
         self.receive_array_strings = receive_array_strings
         self.receive_index =0
-        self.speed = 0
-        self.volume = 0
 
+        self.mcge = MorseCodeGameEngine(speeds=self.maxx - 3, volumes=self.maxx - 3)
+        # register callbacks here for updating UI on changes from game engine
 
         window.addstr(y ,0, "MORSE CODE SECTION")
         y = y+ 2
@@ -42,13 +43,13 @@ class Morse():
         window.addstr(y, 0, "SPEED 0 - {}".format(self.maxx-2))
         rectangle(window, y + 1, 0, y + 3, self.maxx - 1)
         self.speed_y = y + 2
-        self.set_speed(1)
+        # self.mcge.set_speed(1)
         y = y + 4
 
         window.addstr(y, 0, "VOLUME")
         rectangle(window, y + 1, 0, y + 3, self.maxx - 1)
         self.volume_y = y + 2
-        self.set_volume(int((self.maxx-2)/2))
+        # self.mcge.set_volume(int((self.maxx-2)/2))
         y = y + 4
 
     def update_status(self, color=None):
@@ -62,41 +63,29 @@ class Morse():
         self.window.addnstr(self.volume_y, 1, " " * (self.maxx - 2), self.maxx - 2, self.backround_color)
         self.window.addnstr(self.volume_y, 1, " " * int(volume), self.maxx - 2, self.volume_color)
         self.window.refresh()
-        self.volume = volume
+        # self.mcge.set_volume(volume)
 
     def increase_volume(self):
-        if self.volume +1 <= self.maxx-2:
-            self.volume = self.volume+1
-        self.window.addnstr(self.volume_y, 1, " " * (self.maxx - 2), self.maxx - 2, self.backround_color)
-        self.window.addnstr(self.volume_y, 1, " " * int(self.volume), self.maxx - 2, self.volume_color)
-        self.window.refresh()
+        if self.volume + 1 <= self.maxx-2:
+            self.set_volume(self.volume+1)
 
     def decrease_volume(self):
-        if self.volume -1 >= 0:
-            self.volume = self.volume-1
-        self.window.addnstr(self.volume_y, 1, " " * (self.maxx - 2), self.maxx - 2, self.backround_color)
-        self.window.addnstr(self.volume_y, 1, " " * self.volume, self.maxx - 2, self.volume_color)
-        self.window.refresh()
+        if self.volume - 1 >= 0:
+            self.set_volume(self.volume-1)
 
     def set_speed(self, speed):
         self.window.addnstr(self.speed_y, 1, " " * (self.maxx - 2), self.maxx - 2, self.backround_color)
         self.window.addnstr(self.speed_y, 1, " " * speed, self.maxx - 2, self.speed_color)
         self.window.refresh()
-        self.speed = speed
+        # self.mcge.set_speed(speed)
 
     def increase_speed(self):
-        if self.speed +1 <= self.maxx-2:
-            self.speed = self.speed+1
-        self.window.addnstr(self.speed_y, 1, " " * (self.maxx - 2), self.maxx - 2, self.backround_color)
-        self.window.addnstr(self.speed_y, 1, " " * self.speed, self.maxx - 2, self.speed_color)
-        self.window.refresh()
+        if self.speed + 1 <= self.maxx-2:
+            self.set_speed(self.speed+1)
 
     def decrease_speed(self):
-        if self.speed -1 >= 0:
-            self.speed = self.speed-1
-        self.window.addnstr(self.speed_y, 1, " " * (self.maxx - 2), self.maxx - 2, self.backround_color)
-        self.window.addnstr(self.speed_y, 1, " " * self.speed, self.maxx - 2, self.speed_color)
-        self.window.refresh()
+        if self.speed - 1 >= 0:
+            self.set_speed(self.speed-1)
 
     def update_send_receive(self, color, string):
         self.window.addnstr(self.send_receive_y, 1, string + (" " * self.maxx), self.maxx - 2, color)

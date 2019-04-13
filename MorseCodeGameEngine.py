@@ -88,8 +88,8 @@ class MorseCodeGameEngine:
         # Initialise sounds
         self.sounds = {"low_morse": pygame.mixer.Sound(LOW_SOUND_SAMPLES),
                        "high_morse": pygame.mixer.Sound(HIGH_SOUND_SAMPLES),
-                       "no": pygame.mixer.Sound("no.wav"),
-                       "yes": pygame.mixer.Sound("yes.wav"),
+                       "no": pygame.mixer.Sound("sounds/no.wav"),
+                       "yes": pygame.mixer.Sound("sounds/yes.wav"),
                        }
 
         self.key_was_up = GPIO.input(MORSE_KEY)
