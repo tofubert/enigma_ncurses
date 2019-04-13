@@ -40,6 +40,7 @@ class Menu:
                 "2": (self.grid.move_convoi_down, "Grid", "Move Convoi Down", self.SHOW),
                 "4": (self.grid.move_convoi_left, "Grid", "Move Convoi Left", self.SHOW),
                 "6": (self.grid.move_convoi_right, "Grid", "Move Convoi Right", self.SHOW),
+                "0": (self.reset_convoi, "Grid", "Reset Convoi path", self.SHOW),
                 "a": (self.no_action, "Grid", "SUBMIT", self.SHOW),
                 "\n": (self.no_action, "Main", "Go the main Menu", self.SHOW),
 
@@ -130,7 +131,7 @@ class Menu:
         self.window.refresh()
 
     def hidden_check(self):
-        if self.key == "0":
+        if self.key == "0" and self.hidden_state < 3:
             self.hidden_state += 1
         elif self.key == "7" and self.hidden_state == 3:
             self.hidden_state += 1
@@ -139,6 +140,8 @@ class Menu:
         elif self.key == "8" and self.hidden_state == 5:
             self.hidden_state = 0
             self.state = "Hidden"
+        else:
+            self.hidden_state = 0
 
     def stash_key(self):
         self.stashed_key = self.key
@@ -149,7 +152,13 @@ class Menu:
         self.grid.set_mine(y, x)
 
     def place_Uboat(self):
-        pass
+        y = int(self.stashed_key)-1
+        x = int(self.key)-1
+        self.grid.set_uboat(y, x, "MICHEL")
+
+    def reset_convoi(self):
+        self.grid.reset_convoi()
+        self.grid.reset_convoi()
 
     def no_action(self):
         self.hidden_state = 0

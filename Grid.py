@@ -22,7 +22,14 @@ class FieldState(Enum):
     PATH = 4
     CONVOI = 5
 
+HIDE_DANGER_STATE = [
+    FieldState.MINE,
+    FieldState.CONVOI,
+    FieldState.UBOAT
+]
+
 class Field:
+
 
 
     def __init__(self, parent, dim, default_color, path_color):
@@ -34,6 +41,7 @@ class Field:
         self.uboat_name = ""
         self.state = FieldState.EMPTY
         self.convoi_path = False
+        self.danger_color = None
 
     def set_color(self, color):
         self.window.bkgd(" ", color)
@@ -65,31 +73,47 @@ class Field:
         self.window.refresh()
 
     def set_uboat_danger(self, color, name):
-        self.set_color(color)
+        self.danger_color = color
         self.danger_reffs.append(name)
-        self.state = FieldState.DANGER_ZONE
+        if self.state not in HIDE_DANGER_STATE:
+            self.state = FieldState.DANGER_ZONE
+            self.set_color(color)
         self.window.refresh()
 
+    def check_for_danger_and_empty_field(self):
+        if len(self.danger_reffs) == 0:
+            self.set_color(self.default_color)
+            self.state = FieldState.EMPTY
+        else:
+            self.state = FieldState.DANGER_ZONE
+            self.set_color(self.danger_color)
+
+    def unset_convoi_path(self):
+        if self.state == FieldState.PATH:
+            self.convoi_path = False
+            self.check_for_danger_and_empty_field()
+
     def unset_convoi(self):
-        self.set_color(self.default_color)
-        self.state = FieldState.EMPTY
+        if self.state == FieldState.CONVOI:
+            self.check_for_danger_and_empty_field()
 
     def unset_mine(self):
-        self.set_color(self.default_color)
-        self.state = FieldState.EMPTY
+        self.check_for_danger_and_empty_field()
 
     def unset_uboat(self):
         self.window.erase()
-        self.set_color(self.default_color)
-        self.state = FieldState.EMPTY
+        name = self.uboat_name
         self.uboat_name = ""
+        self.check_for_danger_and_empty_field()
         self.window.refresh()
+        return name
+
 
     def unset_uboat_danger(self, name):
         try:
             index = self.danger_reffs.index(name)
             del self.danger_reffs[index]
-            if len(self.danger_reffs) == 0:
+            if len(self.danger_reffs) == 0 and self.state == FieldState.DANGER_ZONE:
                 self.set_color(self.default_color)
                 self.window.refresh()
                 self.state = FieldState.EMPTY
@@ -105,8 +129,10 @@ class Grid:
         self.maxy, self.maxx = window.getmaxyx()
         self.grid_w = 9
         self.grid_h = 6
-        self.convoi_x = 0
-        self.convoi_y =self.grid_h-1
+        self.start_x = 5
+        self.start_y = self.grid_h-1
+        self.convoi_x = self.start_x
+        self.convoi_y = self.start_y
         self.convoi_color, self.mine_color, self.uboat_color, self.path_color = convoi_color, mine_color, uboat_color, path_color
         self.uboat_danger_color = uboat_danger_color
         self.default_color = default_color
@@ -125,7 +151,7 @@ class Grid:
                 self.fields[field_y][field_x] = Field(self.window, dim,
                                                       self.default_color,
                                                       path_color = self.path_color)
-        self.set_convoi(self.convoi_y,self.convoi_x, False)
+        (self.fields[self.convoi_y][self.convoi_x]).set_convoi(self.convoi_color)
         self.set_uboat(0,0, "U110")
         self.set_uboat(1,4, "U888")
         legend = 0
@@ -167,28 +193,58 @@ class Grid:
 
     def move_convoi(self, y, x):
         if self.check_bounds(y, x) :
-            if (self.fields[y][x]).convoi_path:
-                self.set_convoi(y, x, False)
-            else:
-                self.set_convoi(y, x, True)
+            if (self.fields[y][x]).state == FieldState.EMPTY:
+                self.set_convoi(y, x)
 
-    def set_convoi(self, y, x, toggle_old_field):
+
+    def set_convoi(self, y, x):
         if y >= 0 and x >= 0 and x < self.grid_w and y < self.grid_h:
-            (self.fields[self.convoi_y][self.convoi_x]).unset_convoi()
-            if(toggle_old_field):
+            if (self.fields[y][x]).state == FieldState.EMPTY:
+                (self.fields[self.convoi_y][self.convoi_x]).unset_convoi()
                 (self.fields[self.convoi_y][self.convoi_x]).toggle_convoi_path()
-            (self.fields[y][x]).set_convoi(self.convoi_color)
-            self.convoi_x = x
-            self.convoi_y = y
+                (self.fields[y][x]).set_convoi(self.convoi_color)
+                self.convoi_x = x
+                self.convoi_y = y
 
+    def set_danger(self, y, x, name):
+        if y >= 0 and x >= 0 and x < self.grid_w and y < self.grid_h:
+            (self.fields[y][x]).set_uboat_danger(self.uboat_danger_color, name)
+
+    def unset_danger(self, y, x, name):
+        if y >= 0 and x >= 0 and x < self.grid_w and y < self.grid_h:
+            (self.fields[y][x]).unset_uboat_danger(name)
 
     def set_uboat(self, y, x, name):
         if y >= 0 and x >= 0 and x < self.grid_w and y < self.grid_h:
-            (self.fields[y][x]).set_uboat(self.uboat_color, name)
+            state = (self.fields[y][x]).state
+            if state == FieldState.EMPTY or state == FieldState.DANGER_ZONE :
+                (self.fields[y][x]).set_uboat(self.uboat_color, name)
+                self.set_danger(y+1,x+1,name)
+                self.set_danger(y+1,x,name)
+                self.set_danger(y+1,x-1,name)
+                self.set_danger(y-1,x+1,name)
+                self.set_danger(y-1,x,name)
+                self.set_danger(y-1,x-1,name)
+                self.set_danger(y,x+1,name)
+                self.set_danger(y,x-1,name)
+            elif state == FieldState.UBOAT:
+                old_name = (self.fields[y][x]).unset_uboat()
+                self.unset_danger(y+1,x+1,old_name)
+                self.unset_danger(y+1,x,old_name)
+                self.unset_danger(y+1,x-1,old_name)
+                self.unset_danger(y-1,x+1,old_name)
+                self.unset_danger(y-1,x,old_name)
+                self.unset_danger(y-1,x-1,old_name)
+                self.unset_danger(y,x+1,old_name)
+                self.unset_danger(y,x-1,old_name)
 
     def set_mine(self, y, x):
         if y >= 0 and x >= 0 and x < self.grid_w and y < self.grid_h:
-            (self.fields[y][x]).set_mine(self.mine_color)
+            state = (self.fields[y][x]).state
+            if state == FieldState.EMPTY or state == FieldState.DANGER_ZONE :
+                (self.fields[y][x]).set_mine(self.mine_color)
+            elif state == FieldState.MINE:
+                (self.fields[y][x]).unset_mine()
 
 
     def draw_axis(self):
@@ -248,5 +304,15 @@ class Grid:
         startx = 1 + (width * field_x)
         starty = 1 + (hight * field_y)
         return WinDim(starty, startx, starty + hight, startx + width)
+
+    def reset_convoi(self):
+        self.set_convoi(self.start_y, self.start_x)
+        for x in range(self.grid_w):
+            for y in range(self.grid_h):
+                (self.fields[y][x]).unset_convoi_path()
+                (self.fields[y][x]).unset_convoi()
+                (self.fields[y][x]).unset_convoi_path()
+        (self.fields[self.convoi_y][self.convoi_x]).set_convoi(self.convoi_color)
+
 
 
