@@ -1,6 +1,6 @@
-import logging
 from enum import Enum
 import json
+import requests
 
 from curses.textpad import rectangle
 import curses
@@ -139,7 +139,7 @@ class Field:
 
 class Grid:
 
-    def __init__(self, window, convoi_color, mine_color, uboat_color, uboat_danger_color, path_color, default_color, preload_file=None):
+    def __init__(self, window, convoi_color, mine_color, uboat_color, uboat_danger_color, path_color, default_color, preload_file=None, status_addr=None):
         self.window = window
         self.maxy, self.maxx = window.getmaxyx()
         self.grid_w = 9
@@ -151,6 +151,7 @@ class Grid:
         self.convoi_color, self.mine_color, self.uboat_color, self.path_color = convoi_color, mine_color, uboat_color, path_color
         self.uboat_danger_color = uboat_danger_color
         self.default_color = default_color
+        self.status_addr = status_addr
 
         self.fields = [[0 for x in range(self.grid_w)] for y in range(self.grid_h)]
 
@@ -344,17 +345,24 @@ class Grid:
                 if state == int(FieldState.UBOAT):
                     data[x][y]["name"] = (self.fields[y][x]).uboat_name
         with open(file_name, 'w') as f:
-            json.dump(data, f, sort_keys=True)
+            json.dump(data, f, sort_keys=True, indent=2)
+        if self.status_addr is not None:
+            requests.post(self.status_addr, data=json.dumps(data))
 
-    def preload(self, preload_file):
-        with open(preload_file, 'r') as f:
-            data = json.load(f)
+
+    def preload(self, preload_file=None, data_input=None):
+        if preload_file:
+            with open(preload_file, 'r') as f:
+                data = json.load(f)
+        elif data_input:
+            data = data_input
+        else:
+            return
         for x in range(self.grid_w):
             for y in range(self.grid_h):
                 state = data[str(x)][str(y)]["state"]
                 if state == int(FieldState.UBOAT):
-                    name = "Foo"
-                    #data[str(x)][str(y)]["name"]
+                    name = data[str(x)][str(y)]["name"]
                     self.set_uboat(y,x,name)
                 elif state == int(FieldState.MINE):
                     self.set_mine(y,x)

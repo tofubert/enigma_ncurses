@@ -1,15 +1,27 @@
 import curses
+import argparse
+
 
 from curses import wrapper
 from curses.textpad import rectangle
 from Morse import Morse
 from Grid import Grid
 from Menu import Menu
+from time import sleep
 
 
 
 
 def main(stdscr):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--preload", help="preload with a saved file")
+    parser.add_argument("-b", "--boot", help="Skip the boot screen", action="store_true")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("-s", "--server", help="run this instance as a status server", action="store_true")
+    group.add_argument("-a", "--status_address", help="address of the status server")
+
+    args = parser.parse_args()
+
     curses.start_color()
 
     curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_CYAN)
@@ -43,7 +55,13 @@ def main(stdscr):
     MENU_WIN = WinDim(BOAT_WIN.y1+1, 1, curses.LINES - 1, curses.COLS - 1)
     MORSE_WIN = WinDim(2, BOAT_WIN.x1+1, BOAT_WIN.y1, curses.COLS - 1)
 
+    if not args.boot:
+        stdscr.addstr(int(curses.LINES /2  ), int(curses.COLS / 2)-11, "IN MEMORY OF DAN BLACK")
+        stdscr.refresh()
 
+        sleep(3)
+
+        stdscr.erase()
 
     stdscr.addstr(0, 0, "Enigma: Save our Convoy")
 
@@ -70,19 +88,33 @@ def main(stdscr):
                   volume_color=BLACK_ON_BLUE,
                   backround=WHITE_ON_BLACK)
 
-    grid = Grid(boatwin,
-                convoi_color = BLACK_ON_GREEN,
-                mine_color = BLACK_ON_YELLOW,
-                uboat_color = BLACK_ON_RED,
-                uboat_danger_color=BLACK_ON_MAGENTA,
-                path_color = BLACK_ON_CYAN,
-                default_color = WHITE_ON_BLACK,
-                # preload_file="foobar"
-                )
+    if args.preload:
+        grid = Grid(boatwin,
+                    convoi_color = BLACK_ON_GREEN,
+                    mine_color = BLACK_ON_YELLOW,
+                    uboat_color = BLACK_ON_RED,
+                    uboat_danger_color=BLACK_ON_MAGENTA,
+                    path_color = BLACK_ON_CYAN,
+                    default_color = WHITE_ON_BLACK,
+                    preload_file=args.preload,
+                    status_addr=args.status_address
+                    )
+    else:
+        grid = Grid(boatwin,
+                    convoi_color=BLACK_ON_GREEN,
+                    mine_color=BLACK_ON_YELLOW,
+                    uboat_color=BLACK_ON_RED,
+                    uboat_danger_color=BLACK_ON_MAGENTA,
+                    path_color=BLACK_ON_CYAN,
+                    default_color=WHITE_ON_BLACK,
+                    status_addr=args.status_address
+                    )
     menu = Menu(menuwin,
                 morse=morse,
                 grid=grid,
                 stdscr=stdscr)
     menu.run()
+
+
 
 wrapper(main)
