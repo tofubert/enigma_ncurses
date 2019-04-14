@@ -2,7 +2,7 @@ import string
 import random
 from curses.textpad import rectangle
 
-from MorseCodeGameEngine import MorseCodeGameEngine
+# from MorseCodeGameEngine import MorseCodeGameEngine
 
 def random_generator(size=15, chars=string.ascii_uppercase + string.digits, padsize=15):
     str_size = random.randint(1, size)
@@ -22,7 +22,7 @@ class Morse():
         self.receive_array_strings = receive_array_strings
         self.receive_index =0
 
-        self.mcge = MorseCodeGameEngine(speeds=self.maxx - 3, volumes=self.maxx - 3)
+        # self.mcge = MorseCodeGameEngine(speeds=self.maxx - 3, volumes=self.maxx - 3)
         # register callbacks here for updating UI on changes from game engine
 
         window.addstr(y ,0, "MORSE CODE SECTION")

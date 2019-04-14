@@ -71,7 +71,7 @@ def main(stdscr):
                   backround=WHITE_ON_BLACK)
 
     grid = Grid(boatwin,
-                convoi_color = BLACK_ON_BLUE,
+                convoi_color = BLACK_ON_GREEN,
                 mine_color = BLACK_ON_YELLOW,
                 uboat_color = BLACK_ON_RED,
                 uboat_danger_color=BLACK_ON_MAGENTA,

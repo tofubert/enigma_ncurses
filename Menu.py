@@ -1,4 +1,5 @@
 from time import sleep
+from curses.textpad import Textbox, rectangle
 
 class Menu:
 
@@ -152,9 +153,28 @@ class Menu:
         self.grid.set_mine(y, x)
 
     def place_Uboat(self):
-        y = int(self.stashed_key)-1
-        x = int(self.key)-1
-        self.grid.set_uboat(y, x, "MICHEL")
+        y = int(self.stashed_key) - 1
+        x = int(self.key) - 1
+        message = "U"
+        self.window.erase()
+        self.window.addstr(0, 0, " Current Menu is {}. Type uboat number and hit Enter when done.".format(self.state))
+        self.window.refresh()
+        while self.key != "\n":
+            try:
+                self.key = self.stdscr.getkey()
+            except:
+                self.key = " "
+            self.morse.update_status()
+            if self.key.isdigit():
+                message += self.key
+            self.window.erase()
+            self.window.addstr(0, 0,
+                               " Current Menu is {}. Type uboat number and hit Enter when done.".format(self.state))
+            self.window.addstr(1, 0, "UBoat Number is: " + message)
+            self.window.refresh()
+            sleep(0.05)
+        if message != "U":
+            self.grid.set_uboat(y, x, message)
 
     def reset_convoi(self):
         self.grid.reset_convoi()
