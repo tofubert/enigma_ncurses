@@ -6,6 +6,7 @@ import RPi.GPIO as GPIO
 import pygame
 import math
 import numpy as np
+import threading
 from collections import deque
 from enum import Enum
 
@@ -57,10 +58,13 @@ class MorseCodeTxRxMode(Enum):
     RECEIVE = 1
 
 
-class MorseCodeGameEngine:
+class MorseCodeGameEngine(threading.Thread):
     mode = None
 
-    def __init__(self, speeds=3, volumes=8):
+    def __init__(self, speeds=3, volumes=8, set_speed_callback=None,
+                 set_volume_callback=None, set_send_receive_callback=None):
+        super(MorseCodeGameEngine, self).__init__()
+
         # Ensure we use a *copy* of the game mode's messages, otherwise they get removed permanently
         self.state = GameState(GAME_MODES[DEFAULT_GAME_MODE][:])
 
@@ -68,11 +72,13 @@ class MorseCodeGameEngine:
         self.time_since_user_acted = 0
 
         self.volume_steps = [volume/(volumes-1) for volume in range(volumes)]
-        self.current_volume = volumes
+        self.set_volume_callback = set_volume_callback
 
         self.speed_steps = [0.03 + 0.02*speed/(speeds-1) for speed in range(speeds)]
-        self.current_speed = 0
+        self.set_speed_callback = set_speed_callback
 
+        self.set_send_receive_callback = set_send_receive_callback
+        
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(MORSE_KEY, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.setup(TX_SWITCH, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -88,24 +94,37 @@ class MorseCodeGameEngine:
         # Initialise sounds
         self.sounds = {"low_morse": pygame.mixer.Sound(LOW_SOUND_SAMPLES),
                        "high_morse": pygame.mixer.Sound(HIGH_SOUND_SAMPLES),
-                       "no": pygame.mixer.Sound("sounds/no.wav"),
-                       "yes": pygame.mixer.Sound("sounds/yes.wav"),
+                       "no": pygame.mixer.Sound(r'sounds/no.wav'),
+                       "yes": pygame.mixer.Sound(r'sounds/yes.wav'),
                        }
 
         self.key_was_up = GPIO.input(MORSE_KEY)
         self.set_txrx_mode()
+        
         pygame.init()
+
+        self.current_volume = 5
+        if self.set_volume_callback is not None:
+            self.set_volume_callback(self.current_volume)
+
+        self.current_speed = 1
+        if self.set_speed_callback is not None:
+            self.set_speed_callback(self.current_speed)
 
         _LOGGER.debug("Game initialised")
 
     def increase_speed(self, *_):
         if self.current_speed < len(self.speed_steps)-1:
             self.current_speed += 1
+        if self.set_speed_callback is not None:
+            self.set_speed_callback(self.current_speed)
         _LOGGER.debug("Game speed is %s", self.current_speed)
 
     def decrease_speed(self, *_):
         if self.current_speed > 0:
             self.current_speed -= 1
+        if self.set_speed_callback is not None:
+            self.set_speed_callback(self.current_speed)
         _LOGGER.debug("Game speed is %s", self.current_speed)
 
     def increase_volume(self):
@@ -113,6 +132,8 @@ class MorseCodeGameEngine:
             self.current_volume += 1
             for sound in self.sounds.values():
                 sound.set_volume(self.volume_steps[self.current_volume])
+        if self.set_volume_callback is not None:
+            self.set_volume_callback(self.current_volume)
         _LOGGER.debug("Sound volume is %s", self.current_volume)
 
     def decrease_volume(self):
@@ -120,13 +141,19 @@ class MorseCodeGameEngine:
             self.current_volume -= 1
             for sound in self.sounds.values():
                 sound.set_volume(self.volume_steps[self.current_volume])
+        if self.set_volume_callback is not None:
+            self.set_volume_callback(self.current_volume)
         _LOGGER.debug("Sound volume is %s", self.current_volume)
 
     def set_txrx_mode(self, *_):
         if GPIO.input(TX_SWITCH):
             self.set_mode(MorseCodeTxRxMode.RECEIVE)
+            if self.set_send_receive_callback is not None:
+                self.set_send_receive_callback(True)
         else:
             self.set_mode(MorseCodeTxRxMode.SEND)
+            if self.set_send_receive_callback is not None:
+                self.set_send_receive_callback(False)
 
     def set_mode(self, mode):
         _LOGGER.debug("Switching to {}".format(mode))
@@ -242,7 +269,7 @@ class MorseCodeGameEngine:
             else:
                 self.process_symbols()            
 
-    def run_main_loop(self):
+    def run(self):
         '''Set up user input, send a status message to the command line'''
         _LOGGER.debug("target string is %s", self.state.response)
         _LOGGER.info("ready")
