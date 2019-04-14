@@ -11,11 +11,13 @@ except:
     # silently ignore the failure. this one's for Jan
     print('do nothing')
 
+
 def random_generator(size=15, chars=string.ascii_uppercase + string.digits, padsize=15):
     str_size = random.randint(1, size)
     ret = ''.join(random.choice(chars) for x in range(str_size))
     ret = ret + (" " * (padsize-str_size))
     return ret
+
 
 class Morse():
     def __init__(self, window, status_color, receive_array_color, receive_array_strings, volume_color, speed_color, backround):
@@ -54,9 +56,8 @@ class Morse():
         self.volume_y = y + 2
         y = y + 4
 
-#        self.mcge = MorseCodeGameEngine(speeds=self.maxx - 2, volumes=self.maxx - 2,
         if "MorseCodeGameEngine" in sys.modules:
-            self.mcge = MorseCodeGameEngine(speeds=3, volumes=8,
+            self.mcge = MorseCodeGameEngine(speeds=8, volumes=8,
                                             set_speed_callback=self.set_speed,
                                             set_volume_callback=self.set_volume,
                                             set_send_receive_callback=self.update_send_receive_wrapper)
