@@ -219,7 +219,7 @@ class Grid:
 
     def set_convoi(self, y, x):
         if y >= 0 and x >= 0 and x < self.grid_w and y < self.grid_h:
-            if (self.fields[y][x]).state == FieldState.EMPTY:
+            if (self.fields[y][x]).state == FieldState.EMPTY or (x == self.start_x and y == self.start_y):
                 (self.fields[self.convoi_y][self.convoi_x]).unset_convoi()
                 (self.fields[self.convoi_y][self.convoi_x]).set_convoi_path()
                 (self.fields[y][x]).set_convoi(self.convoi_color)

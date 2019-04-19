@@ -1,3 +1,4 @@
+import sys
 import string
 import random
 from curses.textpad import rectangle
@@ -54,12 +55,13 @@ class Morse():
         y = y + 4
 
 #        self.mcge = MorseCodeGameEngine(speeds=self.maxx - 2, volumes=self.maxx - 2,
-        self.mcge = MorseCodeGameEngine(speeds=3, volumes=8,
-                                        set_speed_callback=self.set_speed,
-                                        set_volume_callback=self.set_volume,
-                                        set_send_receive_callback=self.update_send_receive_wrapper)
-        # thread me
-        self.mcge.start()
+        if "MorseCodeGameEngine" in sys.modules:
+            self.mcge = MorseCodeGameEngine(speeds=3, volumes=8,
+                                            set_speed_callback=self.set_speed,
+                                            set_volume_callback=self.set_volume,
+                                            set_send_receive_callback=self.update_send_receive_wrapper)
+            # thread me
+            self.mcge.start()
         
     def update_status(self, color=None):
         if color:
