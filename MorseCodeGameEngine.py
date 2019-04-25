@@ -43,7 +43,7 @@ GAME_MODES = {'D': [("WHO MADE ME", "DAN"), ("AGAIN", "DAN"), ("CORRECT", "")],
               }
 
 # IO pin configuration
-MORSE_KEY = 21
+MORSE_KEY = 26
 
 LOW_SOUND_SAMPLES = [(2**15)*math.sin(2.0 * math.pi * 700 * t / 44100) for t in range(0, 22050)]
 LOW_SOUND_SAMPLES = np.int16(LOW_SOUND_SAMPLES)
