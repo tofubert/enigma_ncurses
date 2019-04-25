@@ -6,7 +6,7 @@ from curses.textpad import rectangle
 from multiprocessing import Process
 
 try:
-    from MorseCodeGameEngine import MorseCodeGameEngine
+    from morse.game_engine import MorseCodeGameEngine
 except:
     # silently ignore the failure. this one's for Jan
     print('do nothing')
@@ -57,7 +57,7 @@ class MorseController():
         self.volume_y = y + 2
         y = y + 4
 
-        if "MorseCodeGameEngine" in sys.modules:
+        if "morse.game_engine" in sys.modules:
             self.mcge = MorseCodeGameEngine(speeds=8, volumes=8,
                                             set_speed_callback=self.set_speed,
                                             set_volume_callback=self.set_volume,

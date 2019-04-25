@@ -1,5 +1,5 @@
-#!/usr/bin/python -p
-from MorseCodeGameEngine import MorseCodeGameEngine
+#!/usr/bin/env python
+from morse.game_engine import MorseCodeGameEngine
 
 import logging
 
@@ -11,4 +11,6 @@ _LOGGER.disabled = True
 # If we've been explicitly called then start the default game
 if __name__ == '__main__':
     _LOGGER.disabled = False
-    MorseCodeGameEngine().run()
+    engine = MorseCodeGameEngine()
+    engine.set_volume(7)
+    engine.run()

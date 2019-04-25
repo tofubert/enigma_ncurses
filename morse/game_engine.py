@@ -83,8 +83,8 @@ class MorseCodeGameEngine(threading.Thread):
         
         pygame.init()
 
-        self.set_volume(math.floor(volumes/2))
-        self.set_speed(0)
+        self.set_volume(int(math.floor(volumes/2)))
+        self.set_speed(int(math.floor(speeds/2)))
 
         _LOGGER.debug("Game initialised")
 
