@@ -1,4 +1,5 @@
 from GameState import GameState
+from morse.symbols import MORSE_LETTERS, MORSE_SYMBOLS
 
 import logging
 import time
