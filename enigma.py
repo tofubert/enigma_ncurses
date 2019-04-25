@@ -4,7 +4,7 @@ import argparse
 
 from curses import wrapper
 from curses.textpad import rectangle
-from Morse import Morse
+from MorseController import MorseController
 from Grid import Grid
 from Menu import Menu
 from time import sleep
@@ -80,13 +80,13 @@ def main(stdscr):
 
     boatwin.refresh()
 
-    morse = Morse(morsewin,
-                  receive_array_color=[BLACK_ON_GREEN, BLACK_ON_RED],
-                  receive_array_strings=["RECEIVE", "SEND"],
-                  status_color=BLACK_ON_YELLOW,
-                  speed_color=BLACK_ON_BLUE,
-                  volume_color=BLACK_ON_BLUE,
-                  backround=WHITE_ON_BLACK)
+    morse = MorseController(morsewin,
+                            receive_array_color=[BLACK_ON_GREEN, BLACK_ON_RED],
+                            receive_array_strings=["RECEIVE", "SEND"],
+                            status_color=BLACK_ON_YELLOW,
+                            speed_color=BLACK_ON_BLUE,
+                            volume_color=BLACK_ON_BLUE,
+                            backround=WHITE_ON_BLACK)
 
     if args.preload:
         grid = Grid(boatwin,

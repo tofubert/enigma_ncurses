@@ -15,24 +15,6 @@ from enum import Enum
 _LOGGER = logging.getLogger("MorseCodeGameEngine")
 
 
-# Morse code translation dictionary and its inverse
-MORSE_LETTERS = {'A': '.-', 'B': '-...', 'C': '-.-.',
-                 'D': '-..',    'E': '.',      'F': '..-.',
-                 'G': '--.',    'H': '....',   'I': '..',
-                 'J': '.---',   'K': '-.-',    'L': '.-..',
-                 'M': '--',     'N': '-.',     'O': '---',
-                 'P': '.--.',   'Q': '--.-',   'R': '.-.',
-                 'S': '...',    'T': '-',      'U': '..-',
-                 'V': '...-',   'W': '.--',    'X': '-..-',
-                 'Y': '-.--',   'Z': '--..',
-               
-                 '0': '-----',  '1': '.----',  '2': '..---',
-                 '3': '...--',  '4': '....-',  '5': '.....',
-                 '6': '-....',  '7': '--...',  '8': '---..',
-                 '9': '----.'
-                 }
-MORSE_SYMBOLS = {symbol: letter for letter, symbol in MORSE_LETTERS.items()}
-
 # Game modes accessible using the CMD symbol (~3 second key press)
 DEFAULT_GAME_MODE = '0'
 GAME_MODES = {'D': [("WHO MADE ME", "DAN"), ("AGAIN", "DAN"), ("CORRECT", "")],

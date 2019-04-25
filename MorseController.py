@@ -19,7 +19,7 @@ def random_generator(size=15, chars=string.ascii_uppercase + string.digits, pads
     return ret
 
 
-class Morse():
+class MorseController():
     def __init__(self, window, status_color, receive_array_color, receive_array_strings, volume_color, speed_color, backround):
         y = 0
         self.window = window
