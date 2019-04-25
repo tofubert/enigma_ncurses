@@ -29,7 +29,8 @@ class Morse():
         self.volume_color = volume_color
         self.receive_array_color = receive_array_color
         self.receive_array_strings = receive_array_strings
-        self.receive_index =0
+        self.receive_index = 0
+        self.dial_increments = 8
 
         window.addstr(y ,0, "MORSE CODE SECTION")
         y = y+ 2
@@ -37,7 +38,7 @@ class Morse():
         window.addstr(y, 0, "SEND VS RECEIVE")
         rectangle(window, y + 1, 0, y + 3, self.maxx - 1)
         self.send_receive_y = y + 2
-        self.toggle_send_receive()
+        self.update_send_receive_wrapper(1)
         y = y + 4
 
         window.addstr(y, 0, "SECURE LINK")
@@ -46,13 +47,13 @@ class Morse():
         self.update_status(status_color)
         y = y + 4
 
-        window.addstr(y, 0, "SPEED 0 - {}".format(self.maxx-2))
-        rectangle(window, y + 1, 0, y + 3, self.maxx - 1)
+        window.addstr(y, 0, "SPEED 0 - {}".format(self.dial_increments-1))
+        rectangle(window, y + 1, 0, y + 3, self.dial_increments)
         self.speed_y = y + 2
         y = y + 4
 
         window.addstr(y, 0, "VOLUME")
-        rectangle(window, y + 1, 0, y + 3, self.maxx - 1)
+        rectangle(window, y + 1, 0, y + 3, self.dial_increments)
         self.volume_y = y + 2
         y = y + 4
 
@@ -94,23 +95,18 @@ class Morse():
         self.mcge.decrease_speed()
 
     def update_send_receive_wrapper(self, receive):
-        if receive:
-            self.update_send_receive(self.receive_array_color[0], self.receive_array_strings[0])
-        else:
-            self.update_send_receive(self.receive_array_color[1], self.receive_array_strings[1])
-
-    def update_send_receive(self, color, string):
-        
-        self.window.addnstr(self.send_receive_y, 1, string + (" " * self.maxx), self.maxx - 2, color)
-        self.window.refresh()
-
-    def toggle_send_receive(self):
-        if self.receive_index == 0:
-            self.receive_index = 1
-        else:
-            self.receive_index = 0
+        self.receive_index = receive
         self.window.addnstr(self.send_receive_y, 1,
                             self.receive_array_strings[self.receive_index] + (" " * self.maxx),
                             self.maxx - 2,
                             self.receive_array_color[self.receive_index])
+        self.update_send_receive(self.receive_array_color[self.receive_index],
+                                 self.receive_array_strings[self.receive_index])
+
+    def update_send_receive(self, color, string):
+        self.window.addnstr(self.send_receive_y, 1, string + (" " * self.maxx), self.maxx - 2, color)
         self.window.refresh()
+
+    def toggle_send_receive(self):
+        self.mcge.toggle_txrx_mode()
+

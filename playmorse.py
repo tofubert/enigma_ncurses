@@ -11,4 +11,4 @@ _LOGGER.disabled = True
 # If we've been explicitly called then start the default game
 if __name__ == '__main__':
     _LOGGER.disabled = False
-    MorseCodeGameEngine().run_main_loop()
+    MorseCodeGameEngine().run()
