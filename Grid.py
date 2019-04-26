@@ -172,8 +172,6 @@ class Grid:
         else:
             (self.fields[self.convoi_y][self.convoi_x]).set_convoi_path()
             (self.fields[self.convoi_y][self.convoi_x]).set_convoi(self.convoi_color)
-            self.set_uboat(0,0, "U110")
-            self.set_uboat(1,4, "U888")
         legend = 0
         uboat_legent = "UBOAT"
         uboat_danger_legent = "UBOAT_RANGE"
