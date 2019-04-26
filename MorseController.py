@@ -73,8 +73,8 @@ class MorseController():
         self.window.refresh()
 
     def set_volume(self, volume):
-        self.window.addnstr(self.volume_y, 1, " " * (self.dial_increments - 2), self.dial_increments - 2, self.backround_color)
-        self.window.addnstr(self.volume_y, 1, " " * int(volume), self.dial_increments - 2, self.volume_color)
+        self.window.addnstr(self.volume_y, 1, " " * (self.dial_increments - 1), self.dial_increments - 1, self.backround_color)
+        self.window.addnstr(self.volume_y, 1, " " * int(volume), self.dial_increments - 1, self.volume_color)
         self.window.refresh()
 
     def increase_volume(self):
@@ -84,8 +84,8 @@ class MorseController():
         self.mcge.decrease_volume()
 
     def set_speed(self, speed):
-        self.window.addnstr(self.speed_y, 1, " " * (self.dial_increments - 2), self.dial_increments - 2, self.backround_color)
-        self.window.addnstr(self.speed_y, 1, " " * speed, self.dial_increments - 2, self.speed_color)
+        self.window.addnstr(self.speed_y, 1, " " * (self.dial_increments - 1), self.dial_increments - 1, self.backround_color)
+        self.window.addnstr(self.speed_y, 1, " " * speed, self.dial_increments - 1, self.speed_color)
         self.window.refresh()
         
     def increase_speed(self):
