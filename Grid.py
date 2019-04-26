@@ -139,7 +139,7 @@ class Field:
 
 class Grid:
 
-    def __init__(self, window, convoi_color, mine_color, uboat_color, uboat_danger_color, path_color, default_color, preload_file=None, status_addr=None):
+    def __init__(self, window, convoi_color, mine_color, uboat_color, uboat_danger_color, path_color, default_color, preload_file=None, status_addr=None, name="test"):
         self.window = window
         self.maxy, self.maxx = window.getmaxyx()
         self.grid_w = 9
@@ -152,6 +152,7 @@ class Grid:
         self.uboat_danger_color = uboat_danger_color
         self.default_color = default_color
         self.status_addr = status_addr
+        self.name = name
 
         self.fields = [[0 for x in range(self.grid_w)] for y in range(self.grid_h)]
 
@@ -335,13 +336,14 @@ class Grid:
     def serialize(self, file_name):
         data = {}
         for x in range(self.grid_w):
-            data[x] = {}
+            data[str(x)] = {}
             for y in range(self.grid_h):
-                data[x][y] = {}
+                data[str(x)][str(y)] = {}
                 state = int((self.fields[y][x]).state)
-                data[x][y]["state"] = state
+                data[str(x)][str(y)]["state"] = state
                 if state == int(FieldState.UBOAT):
-                    data[x][y]["name"] = (self.fields[y][x]).uboat_name
+                    data[str(x)][str(y)]["name"] = (self.fields[y][x]).uboat_name
+        data["name"] = self.name
         with open(file_name, 'w') as f:
             json.dump(data, f, sort_keys=True, indent=2)
         if self.status_addr is not None:
@@ -368,6 +370,7 @@ class Grid:
                     (self.fields[y][x]).set_convoi_path()
                 elif state == int(FieldState.CONVOI):
                     self.set_convoi(y, x)
+        self.name = data["name"]
 
 
 

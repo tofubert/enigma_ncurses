@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import curses
 import argparse
 
@@ -19,6 +20,7 @@ def main(stdscr):
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-s", "--server", help="run this instance as a status server", action="store_true")
     group.add_argument("-a", "--status_address", help="address of the status server")
+    parser.add_argument("-n", "--name", help="give this team a name", default="Test")
 
     args = parser.parse_args()
 
@@ -97,7 +99,8 @@ def main(stdscr):
                     path_color = BLACK_ON_CYAN,
                     default_color = WHITE_ON_BLACK,
                     preload_file=args.preload,
-                    status_addr=args.status_address
+                    status_addr=args.status_address,
+                    name=args.name
                     )
     else:
         grid = Grid(boatwin,
@@ -107,7 +110,8 @@ def main(stdscr):
                     uboat_danger_color=BLACK_ON_MAGENTA,
                     path_color=BLACK_ON_CYAN,
                     default_color=WHITE_ON_BLACK,
-                    status_addr=args.status_address
+                    status_addr=args.status_address,
+                    name=args.name
                     )
     menu = Menu(menuwin,
                 morse=morse,

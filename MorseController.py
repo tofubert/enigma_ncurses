@@ -24,13 +24,13 @@ class MorseController():
         y = 0
         self.window = window
         self.backround_color = backround
+        self.dial_increments = 8
         self.maxy, self.maxx = window.getmaxyx()
         self.speed_color = speed_color
         self.volume_color = volume_color
         self.receive_array_color = receive_array_color
         self.receive_array_strings = receive_array_strings
         self.receive_index = 0
-        self.dial_increments = 8
 
         window.addstr(y ,0, "MORSE CODE SECTION")
         y = y+ 2
@@ -73,8 +73,8 @@ class MorseController():
         self.window.refresh()
 
     def set_volume(self, volume):
-        self.window.addnstr(self.volume_y, 1, " " * (self.maxx - 2), self.maxx - 2, self.backround_color)
-        self.window.addnstr(self.volume_y, 1, " " * int(volume), self.maxx - 2, self.volume_color)
+        self.window.addnstr(self.volume_y, 1, " " * (self.dial_increments - 2), self.dial_increments - 2, self.backround_color)
+        self.window.addnstr(self.volume_y, 1, " " * int(volume), self.dial_increments - 2, self.volume_color)
         self.window.refresh()
 
     def increase_volume(self):
@@ -84,8 +84,8 @@ class MorseController():
         self.mcge.decrease_volume()
 
     def set_speed(self, speed):
-        self.window.addnstr(self.speed_y, 1, " " * (self.maxx - 2), self.maxx - 2, self.backround_color)
-        self.window.addnstr(self.speed_y, 1, " " * speed, self.maxx - 2, self.speed_color)
+        self.window.addnstr(self.speed_y, 1, " " * (self.dial_increments - 2), self.dial_increments - 2, self.backround_color)
+        self.window.addnstr(self.speed_y, 1, " " * speed, self.dial_increments - 2, self.speed_color)
         self.window.refresh()
         
     def increase_speed(self):
