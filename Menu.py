@@ -17,14 +17,6 @@ class Menu:
         self.doexit = False
         self.maxy, self.maxx = window.getmaxyx()
         self.state_machine = {
-            "Morse": {
-                "+": (self.morse.increase_volume, "Morse", "increase volume", self.SHOW),
-                "-": (self.morse.decrease_volume, "Morse", "decrease volume", self.SHOW),
-                "9": (self.morse.increase_speed, "Morse", "increase speed", self.SHOW),
-                "6": (self.morse.decrease_speed, "Morse", "decrease speed", self.SHOW),
-                "0": (self.morse.toggle_send_receive, "Morse", "Switch Send/Receive", self.SHOW),
-                "\n": (self.no_action, "Main", "Go the main Menu", self.SHOW),
-            },
             "Main" : {
                 "1": (self.no_action, "Morse", "Enter the Morse Menu", self.SHOW),
                 "2": (self.no_action, "Grid", "Enter the Grid Menu", self.SHOW),
@@ -99,6 +91,23 @@ class Menu:
             }
         }
 
+        if self.morse is not None:
+            self.state_machine["Morse"] = {
+                "+": (self.morse.increase_volume, "Morse", "increase volume", self.SHOW),
+                "-": (self.morse.decrease_volume, "Morse", "decrease volume", self.SHOW),
+                "9": (self.morse.increase_speed, "Morse", "increase speed", self.SHOW),
+                "6": (self.morse.decrease_speed, "Morse", "decrease speed", self.SHOW),
+                "0": (self.morse.toggle_send_receive, "Morse", "Switch Send/Receive", self.SHOW),
+                "\n": (self.no_action, "Main", "Go the main Menu", self.SHOW),
+            }
+        else :
+            self.state_machine["Selection"] = {
+                "+": (self.no_action, "Morse", "increase volume", self.SHOW),
+                "\n": (self.no_action, "Main", "Go the main Menu", self.SHOW),
+            }
+            self.state_machine["Main"]["1"] = (self.no_action, "Selection", "Select a Team", self.SHOW)
+            del self.state_machine["Main"]["2"]
+
     def run(self):
         self.update_menu()
         while not self.doexit:
@@ -106,9 +115,13 @@ class Menu:
                 self.key = self.stdscr.getkey()
             except:
                 self.key = " "
-            self.morse.update_status()
+            if self.morse is not None:
+                self.morse.update_status()
             func, self.state, _, show = self.state_machine[self.state].get(self.key, (self.no_action, self.state, "", self.SHOW))
-            func()
+            try:
+                func()
+            except:
+                pass
             self.update_menu()
             sleep(0.05)
 

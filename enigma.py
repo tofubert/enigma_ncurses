@@ -82,13 +82,16 @@ def main(stdscr):
 
     boatwin.refresh()
 
-    morse = MorseController(morsewin,
-                            receive_array_color=[BLACK_ON_GREEN, BLACK_ON_RED],
-                            receive_array_strings=["RECEIVE", "SEND"],
-                            status_color=BLACK_ON_YELLOW,
-                            speed_color=BLACK_ON_BLUE,
-                            volume_color=BLACK_ON_BLUE,
-                            backround=WHITE_ON_BLACK)
+    if not args.server:
+        morse = MorseController(morsewin,
+                                receive_array_color=[BLACK_ON_GREEN, BLACK_ON_RED],
+                                receive_array_strings=["RECEIVE", "SEND"],
+                                status_color=BLACK_ON_YELLOW,
+                                speed_color=BLACK_ON_BLUE,
+                                volume_color=BLACK_ON_BLUE,
+                                backround=WHITE_ON_BLACK)
+    else:
+        morse = None
 
     if args.preload:
         grid = Grid(boatwin,
