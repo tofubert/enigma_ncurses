@@ -7,6 +7,7 @@ from multiprocessing import Process
 
 try:
     from morse.game_engine import MorseCodeGameEngine
+    from switches import Switch
 except:
     # silently ignore the failure. this one's for Jan
     print('do nothing')
@@ -47,7 +48,7 @@ class MorseController():
         self.update_status(status_color)
         y = y + 4
 
-        window.addstr(y, 0, "SPEED 0 - {}".format(self.dial_increments-1))
+        window.addstr(y, 0, "SPEED 1 - {}".format(self.dial_increments))
         rectangle(window, y + 1, 0, y + 3, self.dial_increments)
         self.speed_y = y + 2
         y = y + 4
@@ -57,11 +58,17 @@ class MorseController():
         self.volume_y = y + 2
         y = y + 4
 
-        if "morse.game_engine" in sys.modules:
+        if "switches" in sys.modules:
             self.mcge = MorseCodeGameEngine(speeds=8, volumes=8,
                                             set_speed_callback=self.set_speed,
                                             set_volume_callback=self.set_volume,
                                             set_send_receive_callback=self.update_send_receive_wrapper)
+
+            speed_switch = Switch([22, 27, 17], self.set_speed)
+            self.set_speed(speed_switch.get_switch_value())
+            volume_switch = Switch([19, 13, 6], self.set_volume)
+            self.set_volume(volume_switch.get_switch_value())
+
             # thread me
             self.mcge.start()
         
