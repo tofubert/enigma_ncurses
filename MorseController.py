@@ -39,7 +39,7 @@ class MorseController():
         window.addstr(y, 0, "SEND VS RECEIVE")
         rectangle(window, y + 1, 0, y + 3, self.maxx - 1)
         self.send_receive_y = y + 2
-        self.update_send_receive_wrapper(1)
+        self.ui_update_send_receive_wrapper(1)
         y = y + 4
 
         window.addstr(y, 0, "SECURE LINK")
@@ -60,14 +60,14 @@ class MorseController():
 
         if "switches" in sys.modules:
             self.mcge = MorseCodeGameEngine(speeds=8, volumes=8,
-                                            set_speed_callback=self.set_speed,
-                                            set_volume_callback=self.set_volume,
-                                            set_send_receive_callback=self.update_send_receive_wrapper)
+                                            set_speed_callback=self.ui_set_speed,
+                                            set_volume_callback=self.ui_set_volume,
+                                            set_send_receive_callback=self.ui_update_send_receive_wrapper)
 
-            speed_switch = Switch([22, 27, 17], self.set_speed)
-            self.set_speed(speed_switch.get_switch_value())
-            volume_switch = Switch([19, 13, 6], self.set_volume)
-            self.set_volume(volume_switch.get_switch_value())
+            speed_switch = Switch([22, 27, 17], self.mcge.set_speed)
+            self.mcge.set_speed(speed_switch.get_switch_value())
+            volume_switch = Switch([19, 13, 6], self.mcge.set_volume)
+            self.mcge.set_volume(volume_switch.get_switch_value())
 
             # thread me
             self.mcge.start()
@@ -79,7 +79,7 @@ class MorseController():
         self.window.addnstr(self.status_y, 1, status, self.maxx - 2, self.status_color)
         self.window.refresh()
 
-    def set_volume(self, volume):
+    def ui_set_volume(self, volume):
         self.window.addnstr(self.volume_y, 1, " " * (self.dial_increments - 1), self.dial_increments - 1, self.backround_color)
         self.window.addnstr(self.volume_y, 1, " " * int(volume), self.dial_increments - 1, self.volume_color)
         self.window.refresh()
@@ -90,7 +90,7 @@ class MorseController():
     def decrease_volume(self):
         self.mcge.decrease_volume()
 
-    def set_speed(self, speed):
+    def ui_set_speed(self, speed):
         self.window.addnstr(self.speed_y, 1, " " * (self.dial_increments - 1), self.dial_increments - 1, self.backround_color)
         self.window.addnstr(self.speed_y, 1, " " * speed, self.dial_increments - 1, self.speed_color)
         self.window.refresh()
@@ -101,16 +101,16 @@ class MorseController():
     def decrease_speed(self):
         self.mcge.decrease_speed()
 
-    def update_send_receive_wrapper(self, receive):
+    def ui_update_send_receive_wrapper(self, receive):
         self.receive_index = receive
         self.window.addnstr(self.send_receive_y, 1,
                             self.receive_array_strings[self.receive_index] + (" " * self.maxx),
                             self.maxx - 2,
                             self.receive_array_color[self.receive_index])
-        self.update_send_receive(self.receive_array_color[self.receive_index],
+        self.ui_update_send_receive(self.receive_array_color[self.receive_index],
                                  self.receive_array_strings[self.receive_index])
 
-    def update_send_receive(self, color, string):
+    def ui_update_send_receive(self, color, string):
         self.window.addnstr(self.send_receive_y, 1, string + (" " * self.maxx), self.maxx - 2, color)
         self.window.refresh()
 

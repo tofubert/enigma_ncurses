@@ -13,17 +13,17 @@ class Switch:
         self.callback = callback
         self.debounce_time = debounce_time
         self.handler_lock = Lock()
-        self.setup_pins()
+        self._setup_pins()
 
-    def setup_pins(self):
+    def _setup_pins(self):
         for pin in self.input_pins:
             GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-            GPIO.add_event_detect(pin, edge=GPIO.BOTH, callback=self.handler)
+            GPIO.add_event_detect(pin, edge=GPIO.BOTH, callback=self._spawn_handler)
 
-    def handler(self, _):
-        Thread(target=self.singleton_handler).start()
+    def _spawn_handler(self, _):
+        Thread(target=self._handler).start()
     
-    def singleton_handler(self):
+    def _handler(self):
         if not self.handler_lock.acquire(blocking=False):
             return
         
