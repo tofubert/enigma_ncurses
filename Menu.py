@@ -107,6 +107,7 @@ class Menu:
                 "1": (self.status_server.team1, "Selection", "Team 1", self.SHOW),
                 "2": (self.status_server.team2, "Selection", "Team 2", self.SHOW),
                 "3": (self.status_server.team3, "Selection", "Team 3", self.SHOW),
+                "4": (self.status_server.solution, "Selection", "Solution", self.SHOW),
                 "\n": (self.no_action, "Main", "Go the main Menu", self.SHOW),
             }
             self.state_machine["Main"]["1"] = (self.no_action, "Selection", "Select a Team", self.SHOW)

@@ -86,7 +86,7 @@ def main(stdscr):
 
     boatwin.refresh()
 
-    if args.preload:
+    if args.preload and args.server is None:
         grid = Grid(boatwin,
                     convoi_color = BLACK_ON_GREEN,
                     mine_color = BLACK_ON_YELLOW,
@@ -122,6 +122,7 @@ def main(stdscr):
     else:
         morse = None
         status_server = StatusServer(args.server, grid, morsewin,
+                                     solution=args.preload,
                                      highlght_color=BLACK_ON_GREEN,
                                      default_color=WHITE_ON_BLACK)
 
@@ -129,7 +130,8 @@ def main(stdscr):
                 morse=morse,
                 grid=grid,
                 status_server=status_server,
-                stdscr=stdscr)
+                stdscr=stdscr,
+                name=args.name)
     menu.run()
 
 

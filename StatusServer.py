@@ -5,6 +5,7 @@ from threading import Thread
 TEAM1 = "UNIT1"
 TEAM2 = "UNIT2"
 TEAM3 = "UNIT3"
+SOLUTION = "SOLUTION"
 
 class StatusServerHandler(BaseHTTPRequestHandler):
 
@@ -36,7 +37,7 @@ class StatusServerThread(Thread):
         self.httpd.serve_forever()
 
 class StatusServer:
-    def __init__(self, address, grid, sidewindow, highlght_color, default_color, port=8000):
+    def __init__(self, address, grid, sidewindow, highlght_color, default_color, solution, port=8000):
         self.address = address
         self.port = port
         self.grid = grid
@@ -44,6 +45,9 @@ class StatusServer:
         self.highlght_color = highlght_color
         self.default_color = default_color
         self.data = {}
+        with open(solution, 'r') as f:
+            solution_data = json.load(f)
+        self.data[SOLUTION] = solution_data
         self.current = ""
         self.server_thread = StatusServerThread(self.address, self.handle_data, self.port)
         self.server_thread.start()
@@ -66,6 +70,12 @@ class StatusServer:
     def team3(self):
         self.grid.preload(data_input=self.data[TEAM3])
         self.current = TEAM3
+        self.update_teams(self.current)
+
+    def solution(self):
+        self.grid.preload(data_input=self.data[SOLUTION])
+        self.current = SOLUTION
+        self.update_teams(self.current)
 
     def update_teams(self, highlight=""):
         self.sidewindow.clear()
