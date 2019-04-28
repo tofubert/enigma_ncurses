@@ -53,6 +53,15 @@ class Field:
         self.convoi_path = False
         self.danger_color = None
 
+    def reset(self):
+        self.window.erase()
+        self.set_color(self.default_color)
+        self.window.refresh()
+        self.danger_reffs = []
+        self.uboat_name = ""
+        self.state = FieldState.EMPTY
+        self.convoi_path = False
+
     def set_color(self, color):
         self.window.bkgd(" ", color)
         self.window.refresh()
@@ -333,7 +342,7 @@ class Grid:
                 (self.fields[y][x]).unset_convoi_path()
         (self.fields[self.convoi_y][self.convoi_x]).set_convoi(self.convoi_color)
 
-    def serialize(self, file_name):
+    def serialize(self, file_name=None):
         data = {}
         for x in range(self.grid_w):
             data[str(x)] = {}
@@ -344,13 +353,24 @@ class Grid:
                 if state == int(FieldState.UBOAT):
                     data[str(x)][str(y)]["name"] = (self.fields[y][x]).uboat_name
         data["name"] = self.name
-        with open(file_name, 'w') as f:
-            json.dump(data, f, sort_keys=True, indent=2)
+        if file_name is not None:
+            with open(file_name, 'w') as f:
+                json.dump(data, f, sort_keys=True, indent=2)
         if self.status_addr is not None:
-            requests.post(self.status_addr, data=json.dumps(data))
+            try:
+                requests.post("http://" + self.status_addr, data=json.dumps(data), timeout=0.05)
+            except:
+                pass
+
 
 
     def preload(self, preload_file=None, data_input=None):
+
+        for field_x in range(self.grid_w):
+            for field_y in range(self.grid_h):
+                self.fields[field_y][field_x].reset()
+        self.convoi_x = self.start_x
+        self.convoi_y = self.start_y
         if preload_file:
             with open(preload_file, 'r') as f:
                 data = json.load(f)

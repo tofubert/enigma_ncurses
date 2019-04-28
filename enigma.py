@@ -8,6 +8,7 @@ from curses.textpad import rectangle
 from MorseController import MorseController
 from Grid import Grid
 from Menu import Menu
+from StatusServer import StatusServer
 from time import sleep
 
 
@@ -18,7 +19,7 @@ def main(stdscr):
     parser.add_argument("-p", "--preload", help="preload with a saved file")
     parser.add_argument("-b", "--boot", help="Skip the boot screen", action="store_true")
     group = parser.add_mutually_exclusive_group()
-    group.add_argument("-s", "--server", help="run this instance as a status server", action="store_true")
+    group.add_argument("-s", "--server", help="run this instance as a status server")
     group.add_argument("-a", "--status_address", help="address of the status server")
     parser.add_argument("-n", "--name", help="give this team a name", default="Test")
 
@@ -65,7 +66,10 @@ def main(stdscr):
 
         stdscr.erase()
 
-    stdscr.addstr(0, 0, "Enigma: Save our Convoy")
+    if args.name:
+        stdscr.addstr(0, 0, "Enigma: Save our Convoy | Team: " + args.name)
+    else:
+        stdscr.addstr(0, 0, "Enigma: Save our Convoy")
 
     boatwin = curses.newwin(BOAT_WIN.lines, BOAT_WIN.cols, BOAT_WIN.y0, BOAT_WIN.x0)
     rectangle(stdscr, BOAT_WIN.y0-1, BOAT_WIN.x0-1, BOAT_WIN.y1, BOAT_WIN.x1)
@@ -81,17 +85,6 @@ def main(stdscr):
     curses.cbreak()
 
     boatwin.refresh()
-
-    if not args.server:
-        morse = MorseController(morsewin,
-                                receive_array_color=[BLACK_ON_GREEN, BLACK_ON_RED],
-                                receive_array_strings=["RECEIVE", "SEND"],
-                                status_color=BLACK_ON_YELLOW,
-                                speed_color=BLACK_ON_BLUE,
-                                volume_color=BLACK_ON_BLUE,
-                                backround=WHITE_ON_BLACK)
-    else:
-        morse = None
 
     if args.preload:
         grid = Grid(boatwin,
@@ -116,9 +109,26 @@ def main(stdscr):
                     status_addr=args.status_address,
                     name=args.name
                     )
+
+    if not args.server:
+        morse = MorseController(morsewin,
+                                receive_array_color=[BLACK_ON_GREEN, BLACK_ON_RED],
+                                receive_array_strings=["RECEIVE", "SEND"],
+                                status_color=BLACK_ON_YELLOW,
+                                speed_color=BLACK_ON_BLUE,
+                                volume_color=BLACK_ON_BLUE,
+                                backround=WHITE_ON_BLACK)
+        status_server = None
+    else:
+        morse = None
+        status_server = StatusServer(args.server, grid, morsewin,
+                                     highlght_color=BLACK_ON_GREEN,
+                                     default_color=WHITE_ON_BLACK)
+
     menu = Menu(menuwin,
                 morse=morse,
                 grid=grid,
+                status_server=status_server,
                 stdscr=stdscr)
     menu.run()
 

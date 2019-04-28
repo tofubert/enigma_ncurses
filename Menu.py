@@ -6,11 +6,13 @@ class Menu:
     SHOW = True
     NOSHOW = False
 
-    def __init__(self, window, morse, grid, stdscr):
+    def __init__(self, window, morse, grid, status_server, stdscr, name="Test"):
         self.window = window
         self.morse = morse
         self.grid = grid
+        self.status_server = status_server
         self.stdscr = stdscr
+        self.name = name
         self.state = "Main"
         self.key = " "
         self.hidden_state = 0
@@ -102,7 +104,9 @@ class Menu:
             }
         else :
             self.state_machine["Selection"] = {
-                "+": (self.no_action, "Morse", "increase volume", self.SHOW),
+                "1": (self.status_server.team1, "Selection", "Team 1", self.SHOW),
+                "2": (self.status_server.team2, "Selection", "Team 2", self.SHOW),
+                "3": (self.status_server.team3, "Selection", "Team 3", self.SHOW),
                 "\n": (self.no_action, "Main", "Go the main Menu", self.SHOW),
             }
             self.state_machine["Main"]["1"] = (self.no_action, "Selection", "Select a Team", self.SHOW)
@@ -115,15 +119,17 @@ class Menu:
                 self.key = self.stdscr.getkey()
             except:
                 self.key = " "
-            if self.morse is not None:
-                self.morse.update_status()
             func, self.state, _, show = self.state_machine[self.state].get(self.key, (self.no_action, self.state, "", self.SHOW))
             try:
                 func()
             except:
                 pass
+            if self.morse is not None:
+                self.morse.update_status()
+                if self.key != " ":
+                    self.grid.serialize(self.name)
             self.update_menu()
-            sleep(0.05)
+            sleep(0.200)
 
     def update_menu(self):
         self.window.erase()

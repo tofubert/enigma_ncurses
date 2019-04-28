@@ -1,27 +1,80 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
-from io import BytesIO
+from threading import Thread
 
-class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
+TEAM1 = "UNIT1"
+TEAM2 = "UNIT2"
+TEAM3 = "UNIT3"
+
+class StatusServerHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         self.send_response(200)
         self.end_headers()
-        self.wfile.write(b'Hello, world!')
 
     def do_POST(self):
         content_length = int(self.headers['Content-Length'])
         body = self.rfile.read(content_length)
         self.send_response(200)
         self.end_headers()
-        response = BytesIO()
-        response.write(b'This is POST request. ')
-        response.write(b'Received: ')
-        response.write(body)
         data = json.loads(body)
-        print(json.dumps(data, indent=2))
-        self.wfile.write(response.getvalue())
+        if self.server.callback is not None:
+            self.server.callback(data)
+
+    def log_message(self, format, *args, **kwargs):
+        pass
 
 
-httpd = HTTPServer(('192.168.1.2', 8000), SimpleHTTPRequestHandler)
-httpd.serve_forever()
+class StatusServerThread(Thread):
+    def __init__(self, address, datacallback,  port=8000):
+        super(StatusServerThread, self).__init__()
+        self.httpd = HTTPServer((address, port), StatusServerHandler)
+        self.httpd.callback = datacallback
+        self.callback = datacallback
+
+    def run(self):
+        self.httpd.serve_forever()
+
+class StatusServer:
+    def __init__(self, address, grid, sidewindow, highlght_color, default_color, port=8000):
+        self.address = address
+        self.port = port
+        self.grid = grid
+        self.sidewindow = sidewindow
+        self.highlght_color = highlght_color
+        self.default_color = default_color
+        self.data = {}
+        self.current = ""
+        self.server_thread = StatusServerThread(self.address, self.handle_data, self.port)
+        self.server_thread.start()
+
+    def handle_data(self, data):
+        self.data[data["name"]] = data
+        self.update_teams(self.current)
+
+    def team1(self):
+        self.grid.preload(data_input=self.data[TEAM1])
+        self.current = TEAM1
+        self.update_teams(self.current)
+
+
+    def team2(self):
+        self.grid.preload(data_input=self.data[TEAM2])
+        self.current = TEAM2
+        self.update_teams(self.current)
+
+    def team3(self):
+        self.grid.preload(data_input=self.data[TEAM3])
+        self.current = TEAM3
+
+    def update_teams(self, highlight=""):
+        self.sidewindow.clear()
+        self.sidewindow.bkgd(" ", self.default_color)
+        count = 1
+        for name in self.data.keys():
+            if( name == highlight):
+                self.sidewindow.addstr(count, 0, "Team: " + name, self.highlght_color)
+            else:
+                self.sidewindow.addstr(count, 0, "Team: " + name, self.default_color)
+            count += 1
+        self.sidewindow.refresh()
