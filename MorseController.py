@@ -32,6 +32,7 @@ class MorseController():
         self.receive_array_color = receive_array_color
         self.receive_array_strings = receive_array_strings
         self.receive_index = 0
+        self.status_color = backround
 
         window.addstr(y ,0, "MORSE CODE SECTION")
         y = y+ 2
@@ -45,7 +46,7 @@ class MorseController():
         window.addstr(y, 0, "SECURE LINK")
         rectangle(window, y + 1, 0, y + 3, self.maxx - 1)
         self.status_y = y + 2
-        self.update_status(status_color)
+        self.update_status(backround)
         y = y + 4
 
         window.addstr(y, 0, "SPEED 1 - {}".format(self.dial_increments))
@@ -89,6 +90,12 @@ class MorseController():
 
     def decrease_volume(self):
         self.mcge.decrease_volume()
+
+    def ui_toggle_status(self, sound=False):
+        if sound:
+            self.update_status(self.status_color)
+        else:
+            self.update_status(self.backround_color)
 
     def ui_set_speed(self, speed):
         self.window.addnstr(self.speed_y, 1, " " * (self.dial_increments - 1), self.dial_increments - 1, self.backround_color)

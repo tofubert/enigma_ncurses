@@ -36,7 +36,7 @@ class Menu:
                 "4": (self.grid.move_convoi_left, "Grid", "Move Convoy Left", self.SHOW),
                 "6": (self.grid.move_convoi_right, "Grid", "Move Convoy Right", self.SHOW),
                 "0": (self.reset_convoi, "Grid", "Reset Convoy path", self.SHOW),
-                "a": (self.submit, "Grid", "SUBMIT", self.SHOW),
+                "a": (self.submit, "Grid", "SUBMIT", self.NOSHOW),
                 "\n": (self.no_action, "Main", "Go the main Menu", self.SHOW),
 
             },
@@ -95,10 +95,10 @@ class Menu:
 
         if self.morse is not None:
             self.state_machine["Morse"] = {
-                "+": (self.morse.increase_volume, "Morse", "increase volume", self.SHOW),
-                "-": (self.morse.decrease_volume, "Morse", "decrease volume", self.SHOW),
-                "9": (self.morse.increase_speed, "Morse", "increase speed", self.SHOW),
-                "6": (self.morse.decrease_speed, "Morse", "decrease speed", self.SHOW),
+                # "+": (self.morse.increase_volume, "Morse", "increase volume", self.SHOW),
+                # "-": (self.morse.decrease_volume, "Morse", "decrease volume", self.SHOW),
+                # "9": (self.morse.increase_speed, "Morse", "increase speed", self.SHOW),
+                # "6": (self.morse.decrease_speed, "Morse", "decrease speed", self.SHOW),
                 "0": (self.morse.toggle_send_receive, "Morse", "Switch Send/Receive", self.SHOW),
                 "\n": (self.no_action, "Main", "Go the main Menu", self.SHOW),
             }
@@ -138,7 +138,7 @@ class Menu:
         index = 0
         index_y = 1
         state_options = self.state_machine[self.state]
-        for key in state_options:
+        for key in sorted(state_options):
             _, _ , explenation, show = self.state_machine[self.state].get(key, (self.no_action, self.state, ""))
             if show:
                 if key == "\n":

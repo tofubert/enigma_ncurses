@@ -48,8 +48,11 @@ def do_nothing(*_, **__):
 class MorseCodeGameEngine(threading.Thread):
     mode = None
 
-    def __init__(self, speeds=8, volumes=8, set_speed_callback=do_nothing,
-            set_volume_callback=do_nothing, set_send_receive_callback=do_nothing):
+    def __init__(self, speeds=8, volumes=8,
+                 set_speed_callback=do_nothing,
+                 set_volume_callback=do_nothing,
+                 set_send_receive_callback=do_nothing,
+                 set_tone_indicator_callback=do_nothing):
         super(MorseCodeGameEngine, self).__init__()
 
         # Ensure we use a *copy* of the game mode's messages, otherwise they get removed permanently
@@ -65,6 +68,8 @@ class MorseCodeGameEngine(threading.Thread):
         self.set_speed_callback = set_speed_callback
 
         self.set_send_receive_callback = set_send_receive_callback
+
+        self.set_tone_indicator_callback = set_tone_indicator_callback
         
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(MORSE_KEY, GPIO.IN, pull_up_down=GPIO.PUD_UP)
