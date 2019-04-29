@@ -1,6 +1,7 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
 from threading import Thread
+from queue import Queue
 
 TEAM1 = "UNIT1"
 TEAM2 = "UNIT2"
@@ -51,33 +52,44 @@ class StatusServer:
         self.current = ""
         self.server_thread = StatusServerThread(self.address, self.handle_data, self.port)
         self.server_thread.start()
+        self.queue = Queue(maxsize=0)
 
     def handle_data(self, data):
-        self.data[data["name"]] = data
-        self.update_teams(self.current)
+        self.queue.put(data)
+
+    def sort_data(self):
+        while not self.queue.empty():
+            data = self.queue.get(block=False, timeout=0.05)
+            self.data[data["name"]] = data
+            self.update_teams(self.current)
 
     def team1(self):
+        self.sort_data()
         self.grid.preload(data_input=self.data[TEAM1])
         self.current = TEAM1
         self.update_teams(self.current)
 
 
     def team2(self):
+        self.sort_data()
         self.grid.preload(data_input=self.data[TEAM2])
         self.current = TEAM2
         self.update_teams(self.current)
 
     def team3(self):
+        self.sort_data()
         self.grid.preload(data_input=self.data[TEAM3])
         self.current = TEAM3
         self.update_teams(self.current)
 
     def solution(self):
+        self.sort_data()
         self.grid.preload(data_input=self.data[SOLUTION])
         self.current = SOLUTION
         self.update_teams(self.current)
 
     def update_teams(self, highlight=""):
+        self.sort_data()
         self.sidewindow.clear()
         self.sidewindow.bkgd(" ", self.default_color)
         count = 1
