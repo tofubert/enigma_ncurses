@@ -31,11 +31,11 @@ class Menu:
             "Grid" : {
                 "1" : (self.no_action, "UBoat Place Y Axis", "(Un)Place UBOAT", self.SHOW),
                 "3": (self.no_action, "Mine Place Y Axis", "(Un)Place Mine", self.SHOW),
-                "8": (self.grid.move_convoi_up, "Grid", "Move Convoi Up", self.SHOW),
-                "2": (self.grid.move_convoi_down, "Grid", "Move Convoi Down", self.SHOW),
-                "4": (self.grid.move_convoi_left, "Grid", "Move Convoi Left", self.SHOW),
-                "6": (self.grid.move_convoi_right, "Grid", "Move Convoi Right", self.SHOW),
-                "0": (self.reset_convoi, "Grid", "Reset Convoi path", self.SHOW),
+                "8": (self.grid.move_convoi_up, "Grid", "Move Convoy Up", self.SHOW),
+                "2": (self.grid.move_convoi_down, "Grid", "Move Convoy Down", self.SHOW),
+                "4": (self.grid.move_convoi_left, "Grid", "Move Convoy Left", self.SHOW),
+                "6": (self.grid.move_convoi_right, "Grid", "Move Convoy Right", self.SHOW),
+                "0": (self.reset_convoi, "Grid", "Reset Convoy path", self.SHOW),
                 "a": (self.submit, "Grid", "SUBMIT", self.SHOW),
                 "\n": (self.no_action, "Main", "Go the main Menu", self.SHOW),
 

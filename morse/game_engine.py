@@ -22,6 +22,8 @@ GAME_MODES = {'D': [("WHO MADE ME", "DAN"), ("AGAIN", "DAN"), ("CORRECT", "")],
               'N': [("SINK", "")],
               'E': [("WHAT IS YOUR UBOAT NUMBER", "U110"), ("STATE UN IDENTITY NUMBER", "0012"),
                     ("UNLOCK CODE SINK HH", "")],
+              'I': [("CMMDR LEMP WHAT IS YOUR UNIDENTITY", "0012"), ("STATE PASSWORD", "SAFRAN"),
+                    ("MINES EAA DCC FEE CFF EFF BGG DHH", "")],
               '0': [("", "")]
               }
 

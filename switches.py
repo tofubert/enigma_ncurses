@@ -8,7 +8,7 @@ def empty_callback(*_, **__):
 
 
 class Switch:
-    def __init__(self, input_pins, callback=empty_callback, debounce_time=0.3):
+    def __init__(self, input_pins, callback=empty_callback, debounce_time=0.1):
         self.input_pins = input_pins
         self.callback = callback
         self.debounce_time = debounce_time
