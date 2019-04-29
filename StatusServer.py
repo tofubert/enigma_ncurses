@@ -19,7 +19,7 @@ class StatusServerHandler(BaseHTTPRequestHandler):
         body = self.rfile.read(content_length)
         self.send_response(200)
         self.end_headers()
-        data = json.loads(body)
+        data = json.loads(body.decode("utf-8"))
         if self.server.callback is not None:
             self.server.callback(data)
 
