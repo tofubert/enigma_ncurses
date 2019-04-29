@@ -15,7 +15,6 @@ while True:
                     keys += line[2]
                     resps += line[4]
                     count += 1
-                    print(line)
                 elif len(line) == 3 and len(keys) > 0:
                     count += 1
                 if count >= 4:
