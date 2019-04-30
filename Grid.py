@@ -357,8 +357,8 @@ class Grid:
             with open(file_name, 'w') as f:
                 json.dump(data, f, sort_keys=True, indent=2)
         if self.status_addr is not None:
-            requests.post("http://" + self.status_addr + ":8000", data=json.dumps(data), timeout=2)
             try:
+                requests.post("http://" + self.status_addr + ":8000", data=json.dumps(data), timeout=2)
                 pass
             except:
                 pass
